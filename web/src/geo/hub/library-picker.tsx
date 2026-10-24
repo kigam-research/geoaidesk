@@ -3,15 +3,16 @@
  * "서재에서 추가" (gaid-authoring-sources): choose several papers and research notes from 서재 as sources of a Workflow
  * draft. Papers enter with their PDF (or metadata and abstract), notes with their text and figures.
  */
-import { BookOpenIcon, NotebookTextIcon, SearchIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { BookOpenIcon, NotebookTextIcon, SearchIcon, XIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { LibraryItemSummary } from "@/geo/contracts/library";
 import { geoText } from "@/geo/i18n";
 import { listLibrary } from "@/geo/library/api";
+import { openLibrary } from "@/geo/places/navigation";
+import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 import { cn } from "@/lib/utils";
 
 const text = geoText("hub");
@@ -51,6 +52,23 @@ export function LibrarySourcePicker({
   const [query, setQuery] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const closeRef = useRef(onOpenChange);
+  closeRef.current = onOpenChange;
+  useEffect(() => {
+    if (!open) return;
+    const trigger = document.activeElement as HTMLElement | null;
+    searchRef.current?.focus();
+    return () => { if (trigger?.isConnected) trigger.focus(); };
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) { event.preventDefault(); closeRef.current(false); }
+    };
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [open, busy]);
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +78,7 @@ export function LibrarySourcePicker({
     setChosen([]);
     listLibrary({ limit: 500 })
       .then((res) => active && setRows(res.items))
-      .catch((e) => active && setError((e as Error).message));
+      .catch((e) => active && setError(text("library.failed")));
     return () => {
       active = false;
     };
@@ -84,16 +102,20 @@ export function LibrarySourcePicker({
   const toggle = (id: string, on: boolean) =>
     setChosen((cur) => (on ? (cur.includes(id) ? cur : [...cur, id]) : cur.filter((x) => x !== id)));
 
+  if (!open) return null;
   return (
-    <Dialog open={open} onOpenChange={(next) => !busy && onOpenChange(next)}>
-      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{text("library.title")}</DialogTitle>
-          <DialogDescription>{text("library.description")}</DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-wrap items-center gap-3">
+    <aside aria-label={text("library.title")}
+      className="absolute inset-y-0 right-0 z-30 flex w-[min(440px,100%)] shrink-0 flex-col gap-4 overflow-hidden border-l border-gaid-edge bg-gaid-face p-4 shadow-[var(--gaid-shadow-overlay)] xl:static xl:w-[440px] xl:shadow-none">
+        <header>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-base font-semibold">{text("library.title")}</h2>
+            <Button variant="ghost" size="icon-sm" disabled={busy} aria-label={text("library.close")} onClick={() => onOpenChange(false)}><XIcon className="size-4" /></Button>
+          </div>
+          <p className="mt-1 text-sm text-gaid-ink-2">{text("library.description")}</p>
+        </header>
+        <div className="flex flex-col gap-3">
           <div
-            className="gaid-seg flex items-center gap-0.5 rounded-lg border border-gaid-edge bg-gaid-hover p-0.5"
+            className={cn(SEG_TRACK, "w-full flex-nowrap")}
             role="group"
             aria-label={text("library.category")}
           >
@@ -103,21 +125,17 @@ export function LibrarySourcePicker({
                 type="button"
                 aria-pressed={category === c}
                 onClick={() => setCategory(c)}
-                className={cn(
-                  "inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium",
-                  category === c
-                    ? "bg-gaid-face text-gaid-ink shadow-[0_0_0_1px_var(--gaid-edge)]"
-                    : "text-gaid-ink-2 hover:text-gaid-ink",
-                )}
+                className={segItem(category === c, "flex-1 justify-center gap-2")}
               >
                 {text(c === "paper" ? "library.papers" : "library.notes")}
                 <span className="tabular-nums text-gaid-ink-3">{counts[c]}</span>
               </button>
             ))}
           </div>
-          <label className="relative min-w-48 flex-1">
+          <label className="relative block w-full">
             <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
+              ref={searchRef}
               className="pl-8"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -157,14 +175,15 @@ export function LibrarySourcePicker({
             })}
           </ul>
         </div>
-        <DialogFooter className="items-center">
+        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-gaid-edge pt-3">
           <span className="mr-auto text-xs text-muted-foreground tabular-nums">
             {text("library.selected", { count: chosen.length })}
           </span>
-          <Button variant="outline" disabled={busy} onClick={() => onOpenChange(false)}>
-            {text("library.cancel")}
+          <Button variant="ghost" size="sm" disabled={busy} onClick={() => openLibrary()}>
+            {geoText("library")("panel.fullScreen")}
           </Button>
           <Button
+            className="w-full"
             disabled={!chosen.length || busy}
             onClick={async () => {
               setBusy(true);
@@ -173,7 +192,7 @@ export function LibrarySourcePicker({
                 await onAdd(chosen);
                 onOpenChange(false);
               } catch (e) {
-                setError((e as Error).message);
+                setError(text("library.addFailed"));
               } finally {
                 setBusy(false);
               }
@@ -181,8 +200,7 @@ export function LibrarySourcePicker({
           >
             {text(busy ? "library.adding" : chosen.length ? "library.addAction" : "library.addEmpty", { count: chosen.length })}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </footer>
+    </aside>
   );
 }

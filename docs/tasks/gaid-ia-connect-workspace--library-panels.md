@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:35:28Z
+updated: 2026-10-24T06:40:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -28,11 +28,15 @@ Rules: follow AGENTS.md of your worktree (UI guide v2 sections 1, 2, 10 before U
 Evidence: run the relevant checks (cd server && npm run typecheck && npm test -- <your tests>; cd web && npx tsc --noEmit && npm test -- <your tests>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs). Full scripts/check is run by the parent after integration; you may run it if time allows. Record in your task document what you changed and the check results, then task finish.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress. Existing GET /geo/library?filter=project already expands attached folders and descendants; no server route needed. Citation frequency is omitted because summary counts are global, not project-specific.
 ## Next steps
-1. (the next session's first action)
+1. Implement and test the project library panel, then convert the source picker to a responsive side panel.
+2. Capture both panels in Korean across both styles/themes and two desktop sizes; run scoped checks, then finish.
 ## Failed approaches
 ## Notes and decisions
+- Sequential plan: reuse the library API and PDF state; build the project panel; integrate the right-pane switch; convert the authoring picker; test and capture. No independent writer package remains within this child unit. Owned interfaces: panel PDF callback, listLibrary optional projectId, unchanged picker onAdd contract.
+- Minimal additional seams: library/api.ts adds explicit project scope; citation-pdf.tsx opens stored PDFs by item (including papers without a citation key); workspace-persistence.ts retains the new library view.
+- UI rules to verify: D6, G1, G6, L1, B1, P4, R2, I6, I9/I14.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

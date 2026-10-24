@@ -65,6 +65,7 @@ import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
 import { onOpenResearchNoteRequest, takeOpenResearchNote } from "@/geo/notes/open-note";
 import { CitationPdfContext } from "@/geo/library/citation-links";
+import { ProjectLibraryPanel } from "@/geo/library/project-library-panel";
 import { CitationPdfPane, useCitationPdf } from "@/geo/library/citation-pdf";
 import { GaidAppBar } from "@/geo/shell/app-bar";
 import { SystemResourcesButton } from "@/geo/shell/system-resources";
@@ -467,7 +468,7 @@ function WorkspacePage({
   const [activeTabId, setActiveTabId] = useState<string>(
     () => initialState?.activeTabId ?? initialTabId,
   );
-  const [view, setView] = useState<"chat" | "workflows">(
+  const [view, setView] = useState<"chat" | "workflows" | "library">(
     () => initialState?.view ?? "chat",
   );
   const [tabWorkspaceStates, setTabWorkspaceStates] = useState<
@@ -1059,6 +1060,9 @@ function WorkspacePage({
   // GeoAIDesk (gaid-cite-open-pdf): a 서재 citation pressed in a chat answer or a research note opens its PDF page in a
   // column between the preview and the chat.
   const citationPdf = useCitationPdf();
+  useEffect(() => {
+    if (citationPdf.pdf) { setView("library"); setChatOpen(true); }
+  }, [citationPdf.pdf?.sequence]);
   const citationOpener = useMemo(() => ({ open: citationPdf.open }), [citationPdf.open]);
 
   return (
@@ -1296,6 +1300,7 @@ function WorkspacePage({
             onNew={newTab}
             onRename={renameTab}
             onSelectWorkflows={() => setView("workflows")}
+            onSelectLibrary={() => setView("library")}
             onOpenSession={openSession}
             activeSessionId={activeSessionId}
             canExport={(activeMeta?.userMessageCount ?? 0) > 0}
@@ -1331,6 +1336,11 @@ function WorkspacePage({
               onOpenFile={handleFileSelect}
             />
           ))}
+
+          <div className={cn("min-h-0 flex-1 flex-col", view === "library" ? "flex" : "hidden")}>
+            <ProjectLibraryPanel projectId={projectId} selectedId={citationPdf.pdf?.itemId}
+              citedPage={citationPdf.pdf?.page} onOpenPdf={citationPdf.openItem} />
+          </div>
 
           {/* Workflows view */}
           {isActive && view === "workflows" && (

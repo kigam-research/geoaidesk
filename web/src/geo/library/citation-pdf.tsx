@@ -16,6 +16,7 @@ import { citationPage } from "@/geo/contracts/library";
 import { PdfPane } from "@/geo/pdf/pdf-pane";
 import { libraryPdfUrl, resolveCitations } from "./api";
 import type { CitationRequest } from "./citation-links";
+import type { LibraryItemSummary } from "@/geo/contracts/library";
 
 export interface CitationPdf {
   itemId: string;
@@ -48,8 +49,13 @@ export function useCitationPdf() {
     return undefined;
   }, []);
   const close = useCallback(() => setPdf(null), []);
+  const openItem = useCallback((item: LibraryItemSummary, page = 1) => {
+    if (!item.storedPdf) return;
+    sequence.current += 1;
+    setPdf({ itemId: item.id, title: item.title, key: item.citationKey ?? item.title, page, sequence: sequence.current });
+  }, []);
   const documentReady = useCallback((pages: number) => setPdf((p) => (p && p.pages !== pages ? { ...p, pages } : p)), []);
-  return { pdf, open, close, documentReady };
+  return { pdf, open, openItem, close, documentReady };
 }
 
 /** True when the cited page lies beyond the PDF (the pane then goes to the first page and says so). */

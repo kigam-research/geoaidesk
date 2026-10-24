@@ -450,5 +450,27 @@
     "failed": "서재를 읽지 못해 @{key}의 PDF를 열지 못했습니다. 다시 누르세요.",
     "closeHint": "PDF를 닫습니다 (Esc)",
     "closeNoteHint": "정리 노트로 돌아갑니다 (Esc)"
+  },
+  "panel": {
+    "title": "서재",
+    "scope": "문헌 범위",
+    "project": "프로젝트 문헌 {count}",
+    "all": "전체 서재",
+    "search": "제목, 저자로 찾기",
+    "loading": "문헌을 불러오는 중입니다.",
+    "failed": "문헌을 읽지 못했습니다. 다시 시도하세요.",
+    "retry": "다시 읽기",
+    "noMatch": "맞는 문헌이 없습니다.",
+    "emptyProject": "프로젝트에 넣은 문헌이 없습니다. 전체 서재에서 골라 넣으세요.",
+    "empty": "서재에 논문이 없습니다.",
+    "openPdf": "PDF 열기 {page}쪽",
+    "noPdf": "저장된 PDF 없음",
+    "attach": "프로젝트에 넣기",
+    "attaching": "프로젝트에 넣는 중",
+    "attached": "프로젝트에 넣음",
+    "attachFailed": "문헌을 넣지 못했습니다. 다시 시도하세요.",
+    "fullScreen": "서재 전체 화면",
+    "more": "문헌 더 보기",
+    "refine": "검색어로 범위 줄이기"
   }
 }
