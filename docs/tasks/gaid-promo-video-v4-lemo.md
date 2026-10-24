@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T06:40:09Z
+status: done
+updated: 2026-10-24T06:41:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -64,7 +64,9 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - lemo-opuscar 3961ddb + VCSL registered as asset `lemo_opuscar` (configs/inputs.toml). Checks: no automated checks for the
   film sources; scripts/check is run by task finish.
 ## Next steps
-1. None in this unit after finish; user review of both films.
+<!-- task:closed -->
+Closed 2026-10-24T06:41:24Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Round 1 (job -1, 102.3 s) user feedback 2026-10-24 (verbatim): "102초판의 경우 피드백으로 사각형 박스로 영역을 표시할 때
   올바르게 표시해야한다. 현재 해당 영역을 올바르지 못하게 표시하거나 화면에서 엉뚱한 곳을 가리키거나 화면을 자르는 사각 박스가
