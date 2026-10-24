@@ -1,7 +1,7 @@
 ---
 format: 1
 status: ready
-updated: 2026-10-24T02:35:51Z
+updated: 2026-10-24T02:48:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
@@ -96,7 +96,7 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
 - Checks: no automated checks for the film sources; scripts/check unchanged and not run.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T02:35:51Z: ready; the parent gaid-promo-video-v4-lemo integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T02:48:06Z: ready; the parent gaid-promo-video-v4-lemo integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
