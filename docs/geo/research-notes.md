@@ -118,3 +118,28 @@ opened and before institute hub sync. Only the GAID instance whose project holds
 sync) the item shows its last snapshot and cannot be opened in a project. A deleted file keeps the item with "노트 파일 없음".
 Removing the item from the library never touches the file. Note items are never written to Zotero, never exported as
 references and never count as citation scope. 프로젝트에서 열기 opens the project's notebook tab on the note.
+
+## Exports (결과 묶음, 공개 자료)
+
+Two downloads start from a note's 더 보기 menu (gaid-note-bundle-export, user decision 2026-10-24; contract
+`web/src/geo/contracts/note-export.ts`, server `server/src/geo/notes/export.ts`, sheets `web/src/geo/notes/note-export.tsx`).
+Both are previewed first; the download sends the preview's `digest` back and the server answers 409 when the note, its
+files or the candidate list changed in between. The browser saves a file only when its bytes match the server's
+`X-Content-SHA256`.
+
+- **결과 묶음** (`GET/POST /geo/notes/:id/bundle`): for another researcher or a reviewer. ZIP with `note/` (every visible
+  regular file of the note folder; links and dot files skipped; at most 200 files / 64 MiB), `data-fingerprints.json`
+  (files the note's chats read or wrote, from provenance: sha256 and size when used, and whether the file is the same,
+  changed, missing or not compared now; the note folder and dot directories are left out; at most 2,000 rows),
+  `environment/<id>.json` (stored environment records of those chats, at most 16), `workflow/workflow.json` and
+  `workflow/instructions.md` (the method trial of the newest Workflow chat: version from the package origin at start, 지침
+  rendered while the method is installed), `references.md` + `references.json` (cited keys resolved in 서재, CSL JSON keyed
+  by citation key), a README in the UI language, `manifest.json` and `SHA256SUMS`. Data files themselves are never
+  included, and the bundle does not claim reproduction. What could not be included is named as a gap
+  (`NoteBundleGap`) in the preview and the README.
+- **공개 자료 내보내기** (`GET/POST /geo/notes/:id/public-export`): files for the researcher to upload to Gemini Notebook
+  by hand. Candidates are the note as Markdown (reference list appended), the Workflow 지침 as Markdown, and the stored
+  PDFs of cited papers (with the licence from the paper's metadata when recorded, else 이용 조건 확인 안 됨; up to 50 MB
+  each). Nothing is pre-ticked; each chosen file needs its own "기관 밖으로 내보내도 되는 자료입니다" confirmation, and the
+  server refuses a file without `mayLeave: true`. Each export appends a local record to `.kady/geo/public-exports.jsonl`
+  (time, note, file names, sha256). GAID calls no Google service and uploads nothing.

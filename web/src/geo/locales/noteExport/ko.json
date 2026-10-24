@@ -34,8 +34,7 @@
     "environment": "{count, plural, =0 {환경 기록 없음} other {환경 기록 #개}}",
     "workflow": {
       "version": "{title} · version {version}",
-      "draft": "{title} · 초안",
-      "none": "Workflow로 시작한 채팅이 아닙니다."
+      "draft": "{title} · 초안"
     },
     "references": "{count, plural, =0 {인용한 논문 없음} other {인용 논문 #편}}",
     "gaps": {

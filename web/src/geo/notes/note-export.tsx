@@ -19,6 +19,8 @@ import {
 } from "@/geo/contracts/note-export";
 
 const L = (key: string, values?: Record<string, string | number>) => t(`noteExport.${key}`, values);
+/** The sheet body scrolls between the fixed title and the button row, so the primary action stays visible (UI guide L7, B1). */
+const BODY = "-mx-6 min-h-0 flex-1 overflow-y-auto px-6";
 /** Data rows shown in the sheet; the rest are in the bundle's list. */
 const DATA_ROWS = 8;
 
@@ -130,28 +132,21 @@ export function NoteBundleDialog({ projectId, noteId, open, onOpenChange }: { pr
   }).filter((p) => p.count) : [];
   const workflowLine = preview?.workflow
     ? L(preview.workflow.version ? "bundle.workflow.version" : "bundle.workflow.draft", { title: preview.workflow.title ?? preview.workflow.methodId, version: preview.workflow.version ?? "" })
-    : L("bundle.workflow.none");
+    : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[640px]">
+      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>{L("bundle.title")}</DialogTitle>
           <DialogDescription>{L("bundle.intro")}</DialogDescription>
         </DialogHeader>
+        <div className={BODY}>
         {failure ? <Failure failure={failure} scope="bundle" onRetry={() => void reload()} />
           : !preview ? <Skeleton label={L("bundle.loading")} />
           : (
             <div className="space-y-4 text-sm">
               <p className="tabular-nums text-muted-foreground">{L("bundle.summary", { count: preview.files.length, size: formatSize(preview.totalBytes, locale) })}</p>
-              <ul className="divide-y rounded-md border">
-                {parts.map(({ part, count, bytes }) => (
-                  <li key={part} className="flex min-h-10 items-center justify-between gap-3 px-3 py-2">
-                    <span>{L(`bundle.part.${part as NoteBundlePart}`)}</span>
-                    <span className="tabular-nums text-muted-foreground">{L("bundle.files", { count })} · {formatSize(bytes, locale)}</span>
-                  </li>
-                ))}
-              </ul>
               <section aria-labelledby="note-bundle-data" className="space-y-1.5">
                 <h3 id="note-bundle-data" className="font-medium">{L("bundle.data.heading", { count: preview.data.length })}</h3>
                 {preview.data.length === 0 ? <p className="text-muted-foreground">{L("bundle.data.none")}</p> : (
@@ -169,7 +164,7 @@ export function NoteBundleDialog({ projectId, noteId, open, onOpenChange }: { pr
                 {preview.data.length > DATA_ROWS && <p className="text-xs text-muted-foreground">{L("bundle.data.more", { count: preview.data.length - DATA_ROWS })}</p>}
               </section>
               <ul className="space-y-1 text-muted-foreground">
-                <li>{workflowLine}</li>
+                {preview.workflow && <li>{workflowLine}</li>}
                 <li>{L("bundle.environment", { count: preview.environments })}</li>
                 <li>{L("bundle.references", { count: preview.references.length })}</li>
               </ul>
@@ -183,9 +178,17 @@ export function NoteBundleDialog({ projectId, noteId, open, onOpenChange }: { pr
                   </ul>
                 </section>
               )}
-              <details className="text-xs text-muted-foreground">
-                <summary className="cursor-pointer select-none">{L("bundle.showFiles")}</summary>
-                <ul className="mt-2 space-y-0.5 font-mono">
+              <details className="text-sm">
+                <summary className="cursor-pointer select-none text-muted-foreground">{L("bundle.showFiles")}</summary>
+                <ul className="mt-2 divide-y rounded-md border">
+                  {parts.map(({ part, count, bytes }) => (
+                    <li key={part} className="flex min-h-10 items-center justify-between gap-3 px-3 py-2">
+                      <span>{L(`bundle.part.${part as NoteBundlePart}`)}</span>
+                      <span className="tabular-nums text-muted-foreground">{L("bundle.files", { count })} · {formatSize(bytes, locale)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <ul className="mt-2 space-y-0.5 font-mono text-xs text-muted-foreground">
                   {preview.files.map((f) => <li key={f.name} className="flex justify-between gap-3"><span className="truncate">{f.name}</span><span className="shrink-0 tabular-nums">{formatSize(f.bytes, locale)}</span></li>)}
                 </ul>
               </details>
@@ -194,6 +197,7 @@ export function NoteBundleDialog({ projectId, noteId, open, onOpenChange }: { pr
               {downloadFailure && <Failure failure={downloadFailure} scope="bundle" onRetry={downloadFailure.kind === "changed" ? () => void reload() : undefined} />}
             </div>
           )}
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{L("bundle.close.button")}</Button>
           <Button disabled={!preview || busy} onClick={() => void download()}>{busy ? L("bundle.download.busy") : L("bundle.download.button")}</Button>
@@ -239,21 +243,22 @@ export function PublicExportDialog({ projectId, noteId, open, onOpenChange }: { 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[640px]">
+      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>{L("public.title")}</DialogTitle>
           <DialogDescription>{L("public.intro")}</DialogDescription>
         </DialogHeader>
+        <div className={BODY}>
         {failure ? <Failure failure={failure} scope="public" onRetry={() => void reload()} />
           : !preview ? <Skeleton label={L("public.loading")} />
           : (
             <div className="space-y-4 text-sm">
               <p className="font-medium">{L("public.confirmEach")}</p>
-              <ul className="space-y-2">
+              <ul className="divide-y rounded-md border">
                 {preview.candidates.map((c) => {
                   const inputId = `public-export-${c.id}`;
                   return (
-                    <li key={c.id} className="rounded-md border px-3 py-2.5">
+                    <li key={c.id} className="px-3 py-2.5">
                       <div className="flex items-baseline justify-between gap-3">
                         <span className="min-w-0">
                           <span className="text-xs text-muted-foreground">{L(`public.kind.${c.kind}`)}</span>
@@ -284,6 +289,7 @@ export function PublicExportDialog({ projectId, noteId, open, onOpenChange }: { 
               {downloadFailure && <Failure failure={downloadFailure} scope="public" onRetry={downloadFailure.kind === "changed" ? () => void reload() : undefined} />}
             </div>
           )}
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{L("public.close.button")}</Button>
           <Button disabled={!chosen.length || busy} onClick={() => void download()}>{busy ? L("public.export.busy") : L("public.export.button")}</Button>
