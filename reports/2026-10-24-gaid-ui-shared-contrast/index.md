@@ -4,7 +4,7 @@ date: 2026-10-24
 project: geoaidesk
 task: gaid-ui-shared-contrast
 headline: 공용 버튼·탭·사이드바·입력칸의 대비 미달 다섯 곳과 초점 고리를 색 역할만 바꿔 고쳤습니다. 네 화면 조합에서 impeccable 대비 결과가 7건에서 0건, axe 결과가 11건에서 0건이 되었습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-parts-four-after.png
 supersedes:
