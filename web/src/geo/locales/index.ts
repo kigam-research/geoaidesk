@@ -88,6 +88,12 @@ import devPartsKo from "./devParts/ko.json";
 import devPartsEn from "./devParts/en.json";
 import placesKo from "./places/ko.json";
 import placesEn from "./places/en.json";
+import digestKo from "./digest/ko.json";
+import digestEn from "./digest/en.json";
+import digestImportKo from "./digestImport/ko.json";
+import digestImportEn from "./digestImport/en.json";
+import digestStartKo from "./digestStart/ko.json";
+import digestStartEn from "./digestStart/en.json";
 import devLibraryPrepKo from "./devLibraryPrep/ko.json";
 import devLibraryPrepEn from "./devLibraryPrep/en.json";
 
@@ -112,6 +118,9 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   hub: pair(hubKo, hubEn),
   devParts: pair(devPartsKo, devPartsEn),
   places: pair(placesKo, placesEn),
+  digest: pair(digestKo, digestEn),
+  digestImport: pair(digestImportKo, digestImportEn),
+  digestStart: pair(digestStartKo, digestStartEn),
   devLibraryPrep: pair(devLibraryPrepKo, devLibraryPrepEn),
   hubServer: pair(hubServerKo, hubServerEn),
   hubSkills: pair(hubSkillsKo, hubSkillsEn),

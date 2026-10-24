@@ -6,6 +6,12 @@ import type {
   CitationResolution,
   CreateLibraryItemBody,
   CslItem,
+  DigestCandidatesResponse,
+  DigestImportBody,
+  DigestImportPreview,
+  LibraryDigestStatus,
+  MakeDigestBody,
+  MakeDigestResponse,
   ExportFormat,
   FolderCheckResponse,
   FolderMembershipResult,
@@ -74,6 +80,26 @@ export const addNoteToLibrary = (body: AddLibraryNoteBody, projectId?: string) =
 export const listNoteCandidates = () => call<LibraryNoteCandidatesResponse>("/notes/candidates");
 /** Removes a library item (a research note item only; the note file stays). */
 export const removeLibraryItem = (id: string) => call<null>(`/items/${encodeURIComponent(id)}`, { method: "DELETE" });
+
+// --- 문헌 정리 (gaid-library-prep) -------------------------------------------------------------------------------------
+/** Asks for a GAID-made 문헌 정리 in a project; the reply carries the chat message for that project's new chat. */
+export const makeDigest = (body: MakeDigestBody) =>
+  call<MakeDigestResponse>("/digests/requests", { method: "POST", body: JSON.stringify(body) }, body.projectId);
+/** The researcher's review mark on a 문헌 정리. */
+export const setDigestStatus = (id: string, status: LibraryDigestStatus) =>
+  call<{ item: LibraryItem }>(`/digests/${encodeURIComponent(id)}/status`, { method: "POST", body: JSON.stringify({ status }) });
+/** Digests a Workflow start can read first (project scope; `method` = an installed Workflow's runtime name). */
+export const getDigestCandidates = (projectId: string, method?: string) =>
+  call<DigestCandidatesResponse>(`/digests/for-start${method ? `?method=${encodeURIComponent(method)}` : ""}`, undefined, projectId);
+/** Reads an exported Gemini Notebook file and matches its sources with the library (nothing is saved yet). */
+export async function previewDigestImport(file: File): Promise<DigestImportPreview> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return call("/digests/import/preview", { method: "POST", body: JSON.stringify({ fileName: file.name, data: btoa(binary) }) });
+}
+/** Saves a previewed file as an 외부 정리 (검토 전). */
+export const importDigest = (body: DigestImportBody) => call<{ item: LibraryItem }>("/digests/import", { method: "POST", body: JSON.stringify(body) });
 
 export async function uploadLibraryPdf(file: File): Promise<UploadedLibraryFile> {
   const bytes = new Uint8Array(await file.arrayBuffer());
