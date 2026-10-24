@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T02:48:06Z
+status: active
+updated: 2026-10-24T05:15:08Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
@@ -95,8 +95,10 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
   figures/40s-{1-scatter,2-cycle,3-brain,4-end}.png. Humanizer not run on it; the parent runs it before review-copy.
 - Checks: no automated checks for the film sources; scripts/check unchanged and not run.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-24T02:48:06Z: ready; the parent gaid-promo-video-v4-lemo integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Round 2 (parent message 2026-10-24, user feedback on the cycle scene and on how GAID 허브/시스템/내 서재 are
+   described): dial ring + legend + copy/colours done in scene/film.js (TREATMENT.md §11). Re-render with a job, update
+   section-40s.md and figures, then task finish and check that origin/task/gaid-promo-video-v4-lemo--promo-40s moved
+   (the first finish commit a26b8bcd was never published).
 
 ## Failed approaches
 ## Notes and decisions

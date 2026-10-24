@@ -155,20 +155,9 @@
     q.fillStyle = rg; q.fillRect(0, 0, 128, 128);
   }
 
-  const RC = { x: 790, y: 590 }, R = 210;
+  const RC = { x: 790, y: 545 }, R = 210;
   const zPull = monotone([[30, 0], [31, Math.log(0.68)], [32, Math.log(0.47)], [33, Math.log(0.34)], [34, Math.log(0.26)], [35, Math.log(0.22)]]);
-  function lateral(t) { // camera leans a little toward the active station during the cycle
-    if (t < T.cycle - 0.5 || t > 30.6) return [0, 0];
-    let ax = 0, ay = 0;
-    for (let k = 0; k < LEGS.length; k++) {
-      const p = stationPos(LEGS[k].ang);
-      const w = k === 0 ? seg(t, T.cycle - 0.5, T.cycle) : seg(t, LEGS[k].t - 0.5, LEGS[k].t);
-      const e = inOut(w);
-      ax = lerp(ax, (p.x - RC.x) * 0.05, e); ay = lerp(ay, (p.y - RC.y) * 0.05, e);
-    }
-    const off = 1 - inOut(seg(t, 30.0, 30.6));
-    return [ax * off, ay * off];
-  }
+  const lateral = () => [0, 0]; // the dial turns instead of the camera leaning
   function camAt(t) {
     t = ft(t);
     let cx = 960, cy = 540, z = 1, rot = 0;
@@ -453,24 +442,31 @@
   }
 
   // ---------- section E: the ring and its stations ----------
+  // One platform: GAID 허브 (make and share Workflows) + GAID 시스템 (install them and analyse with an AI agent), with
+  // 내 서재 as the researcher's own literature space. The ring turns like a dial so the active station always faces its
+  // window on the right: the hairline to the window never crosses the ring.
+  const PART = {
+    hub: { name: 'GAID 허브', color: C.sig, desc: '논문·문헌·연구노트로 Workflow를 만들고 공유하는 공간' },
+    sys: { name: 'GAID 시스템', color: C.sigInk, desc: 'Workflow를 설치하고 AI agent와 분석하는 연구 프레임워크' },
+    me: { name: '내 서재', color: C.ink, desc: '연구자 개인의 문헌 관리 공간' },
+  };
   const ST = [
-    { name: '내 서재', icon: 'library', part: 0 },
-    { name: 'Workflow', icon: 'workflow', part: 1 },
-    { name: 'GAID 허브', icon: 'share-2', part: 1 },
-    { name: '연구 분석', icon: 'message-square-text', part: 0 },
-    { name: '연구노트', icon: 'notebook-pen', part: 0 },
+    { name: '내 서재', icon: 'library', part: 'me' },
+    { name: 'Workflow', icon: 'workflow', part: 'hub' },
+    { name: 'GAID 허브', icon: 'share-2', part: 'hub' },
+    { name: '연구 분석', icon: 'message-square-text', part: 'sys' },
+    { name: '연구노트', icon: 'notebook-pen', part: 'sys' },
   ];
   const ST_ANG = [162, 234, 306, 378, 450];
-  const PARTS = ['GAID 시스템', 'GAID 허브'];
   const LEGS = [
-    { st: 0, cap: '논문에서 시작합니다', take: 'lib' },
+    { st: 0, cap: '내 문헌에서 시작합니다', take: 'lib' },
     { st: 1, cap: '논문 속 방법을 Workflow로', take: 'wf' },
     { st: 2, cap: '공유하고 고쳐 다음 version으로', take: 'hub' },
-    { st: 3, cap: 'AI agent가 Workflow대로 분석', take: 'run' },
+    { st: 3, cap: '설치한 Workflow로 AI agent와 분석', take: 'run' },
     { st: 4, cap: '결과와 판단은 연구노트에', take: 'note' },
-    { st: 0, cap: '다시 내 서재로', take: 'back' },
+    { st: 0, cap: '연구노트도 내 서재로', take: 'back' },
   ].map((l, k) => ({ ...l, k, t: T.cycle + 2 * k, ang: k === 5 ? 522 : ST_ANG[l.st] }));
-  const WR = { x: 1080, y: 300, w: 776, h: 476 };
+  const WR = { x: 1100, y: 307, w: 776, h: 476 };
   for (const lg of LEGS) {
     lg.o0 = lg.t - 0.05; lg.c0 = lg.k === 5 ? 29.0 : lg.t + 1.85;
     if (lg.k > 0) ev(lg.t - 0.5, 'move', { k: lg.k });
@@ -479,13 +475,13 @@
   ev(T.freeze, 'freeze'); ev(10.2, 'windup'); ev(T.press, 'press'); ev(T.sweepA, 'sweep', { dur: 1.1 }); ev(T.crt, 'crtoff');
   ev(T.ring, 'fly'); ev(T.ringDraw, 'ringdraw', { dur: 1.25 });
   for (let k = 0; k < 5; k++) ev(T.ringDraw + 0.25 * k, 'node', { k });
-  ev(15.8, 'label'); ev(16.3, 'label');
+  ev(15.8, 'label'); ev(16.05, 'label'); ev(16.3, 'label');
   for (let k = 0; k < 5; k++) ev(T.lap + 0.125 * k, 'lapTick', { k });
   ev(T.lap + 0.625, 'lapDone');
-  for (let k = 0; k < 6; k++) ev(30.0 + 0.0625 * k, 'retract', { k });
+  for (let k = 0; k < 6; k++) ev(30.45 + 0.0625 * k, 'retract', { k });
 
   function stationPos(angDeg) { const a = rad(angDeg); return { x: RC.x + R * Math.cos(a), y: RC.y + R * Math.sin(a) }; }
-  function dotAngle(t) {
+  function dotAngle(t) { // ring-local angle of the AI agent's dot
     if (t < T.ringDraw) return ST_ANG[0];
     if (t < T.ringDraw + 1.25) return 162 + 360 * (t - T.ringDraw) / 1.25;
     if (t < T.cycle + 0.5) return 522;
@@ -502,111 +498,122 @@
     if (t < T.lap + 0.625) return 522 + 360 * (t - T.lap) / 0.625;
     return 882 + 180 * (t - (T.lap + 0.625));
   }
-  function visitedAng(t) { // how far the cycle has gone (progress arc), degrees from 162
+  function ringRot(t) { // the dial: keeps the active station (and the dot) at 3 o'clock until the lap ends
+    if (t < T.ringDraw + 1.25) return -162;
+    if (t < T.lap + 0.625) return -dotAngle(t);
+    return -882;
+  }
+  const worldPos = (ang, t) => stationPos(ang + ringRot(t));
+  function visitedAng(t) { // how far the cycle has gone, degrees from 162 (ring-local)
     if (t < T.cycle) return 0;
     if (t < 29.0) return dotAngle(t) - 162;
     return 360;
   }
   function arcStroke(cx, cy, r, a0, a1, style, lw) { if (a1 <= a0) return; ctx.save(); ctx.lineWidth = lw; ctx.strokeStyle = style; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, r, rad(a0), rad(a1)); ctx.stroke(); ctx.restore(); }
+  function rgba(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${n >> 8 & 255},${n & 255},${a})`; }
   function drawGhostPlan(t) { // the cycle's plan shows faintly before the dot draws it
     const a = seg(t, T.crt, T.crt + 0.25) * (1 - seg(t, T.ringDraw + 0.9, T.ringDraw + 1.25));
     if (a <= 0) return;
     ctx.save(); ctx.globalAlpha = a; ctx.setLineDash([5, 8]); ctx.lineWidth = 1.6; ctx.strokeStyle = 'rgba(127,162,255,0.5)';
     ctx.beginPath(); ctx.arc(RC.x, RC.y, R, 0, 2 * Math.PI); ctx.stroke();
-    for (const ang of ST_ANG) { const p = stationPos(ang); ctx.beginPath(); ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI); ctx.stroke(); }
+    for (const ang of ST_ANG) { const p = worldPos(ang, t); ctx.beginPath(); ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI); ctx.stroke(); }
     ctx.restore();
   }
+  // ring-local arcs: 내 서재 around 162, GAID 허브 over Workflow and 허브, GAID 시스템 over 분석 and 연구노트
+  const ARCS = [[162, 198, 'me'], [198, 342, 'hub'], [342, 486, 'sys'], [486, 522, 'me']];
   function drawRing(t, c, layer) {
     if (layer === 'arcs') drawGhostPlan(t);
     if (t < T.ring || t > T.end + 0.05) return;
     if (layer === 'nodes') return drawNodes(t, c);
     const lw = 1.6 / Math.max(c.z, 0.2) * Math.max(c.z, 0.45);
     const drawn = t < T.ringDraw ? 0 : Math.min(360, 360 * (t - T.ringDraw) / 1.25);
-    if (drawn > 0) {
-      // the two parts as two arcs with a small gap: GAID 허브 (top) and GAID 시스템
-      const parts = [[198 + 3, 342 - 3, 1], [342 + 3, 558 - 3, 0]];
-      for (const [a0, a1, hub] of parts) {
-        const e = Math.min(a1, 162 + drawn), s = a0;
-        if (162 + drawn > s) arcStroke(RC.x, RC.y, R, s, e, hub ? 'rgba(231,233,238,0.30)' : 'rgba(231,233,238,0.20)', hub ? 2.2 * lw : 1.6 * lw);
-      }
-      // the start segment 162..198 belongs to the system arc's tail
-      arcStroke(RC.x, RC.y, R, 162, Math.min(198 - 3, 162 + drawn), 'rgba(231,233,238,0.20)', 1.6 * lw);
-      // ring head while drawing
-      if (drawn < 360) { const head = 162 + drawn; arcStroke(RC.x, RC.y, R, head - 40, head, 'rgba(127,162,255,0.85)', 3 * lw); }
-      // the cycle so far in the accent
-      const va = visitedAng(t);
-      if (va > 0) arcStroke(RC.x, RC.y, R, 162, 162 + va, `rgba(51,102,232,${t > 29 ? 0.75 : 0.55})`, 3.2 * lw);
-      if (t > 29.0 && t < T.lap + 0.9) { const g = 1 - seg(t, T.lap + 0.625, T.lap + 0.9); glow(RC.x, RC.y, R * 1.25, 0.12 * g * seg(t, T.lap, T.lap + 0.3)); }
+    if (drawn <= 0) return;
+    const rot = ringRot(t), va = visitedAng(t), head = 162 + drawn;
+    for (const [a0, a1, part] of ARCS) {
+      const s = a0 + (a0 === 162 ? 0 : 2.5), e = Math.min(a1 - (a1 === 522 ? 0 : 2.5), head);
+      if (e <= s) continue;
+      const col = PART[part].color, w = (part === 'me' ? 2.0 : 2.8) * lw;
+      arcStroke(RC.x, RC.y, R, s + rot, e + rot, rgba(col, t > 29 ? 0.85 : 0.38), w);
+      const ve = Math.min(e, 162 + va);
+      if (ve > s) arcStroke(RC.x, RC.y, R, s + rot, ve + rot, rgba(col, 0.95), w * 1.25);
     }
+    if (drawn < 360) arcStroke(RC.x, RC.y, R, head - 40 + rot, head + rot, 'rgba(127,162,255,0.9)', 3 * lw);
+    if (t > 29.0 && t < T.lap + 0.9) { const g = 1 - seg(t, T.lap + 0.625, T.lap + 0.9); glow(RC.x, RC.y, R * 1.25, 0.12 * g * seg(t, T.lap, T.lap + 0.3)); }
   }
   function drawNodes(t, c) {
-    // stations
     const nodeRetract = k => t > 35.3 ? 1 - backIn(seg(t, 35.3 + 0.0625 * k, 35.3 + 0.0625 * k + 0.15), 1.5) : 1;
+    // GAID's mark at the ring's centre: both parts are one platform
+    const ma = out3(seg(t, 15.9, 16.2)) * nodeRetract(5);
+    if (LOGO_MARK && ma > 0.01) { ctx.save(); ctx.globalAlpha = ma; const s = 84 * (0.85 + 0.15 * ma); ctx.drawImage(LOGO_MARK, RC.x - s / 2, RC.y - s / 2, s, s); ctx.restore(); }
     for (let k = 0; k < 5; k++) {
       const pop = back(seg(t, T.ringDraw + 0.25 * k, T.ringDraw + 0.25 * k + 0.22), 1.8) * nodeRetract(k);
       if (pop <= 0.01) continue;
-      const p = stationPos(ST_ANG[k]);
+      const p = worldPos(ST_ANG[k], t), col = PART[ST[k].part].color;
       const activeLeg = LEGS.find(l => t >= l.t - 0.05 && t < l.t + 2 - 0.05 && l.st === k && t < 29.0);
       const visited = LEGS.some(l => l.st === k && t >= l.t);
       ctx.save(); ctx.translate(p.x, p.y); ctx.scale(pop, pop);
       const r = 30;
       ctx.fillStyle = activeLeg ? '#1e2b4d' : C.face2; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
-      ctx.lineWidth = activeLeg ? 2 : 1.2; ctx.strokeStyle = activeLeg ? C.sigInk : visited ? 'rgba(231,233,238,0.35)' : 'rgba(255,255,255,0.14)';
+      ctx.lineWidth = activeLeg ? 2.4 : 1.4; ctx.strokeStyle = rgba(col, activeLeg ? 1 : visited ? 0.7 : 0.4);
       ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.stroke();
-      if (c.z * 30 > 9) icon(ST[k].icon, -13, -13, 26, activeLeg ? 'sigInk' : visited ? 'ink' : 'ink3');
+      if (c.z * 30 > 9) icon(ST[k].icon, -13, -13, 26, activeLeg ? 'sigInk' : visited ? 'ink' : 'ink2');
       ctx.restore();
     }
-    // part labels
-    const lab = (id, s, sub, y, ta, dy) => {
-      const a = out3(seg(t, ta, ta + 0.25)) * (1 - seg(t, 30.0, 30.25));
+  }
+  function drawLegend(t) { // HUD: what the three colours mean, held through the cycle
+    if (t < 15.8 || t > 29.8) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    [['hub', 96, 15.8], ['sys', 716, 16.05], ['me', 1336, 16.3]].forEach(([key, x, ta], i) => {
+      const a = out3(seg(t, ta, ta + 0.25)) * (1 - seg(t, 29.3 + 0.06 * i, 29.5 + 0.06 * i));
       if (a <= 0) return;
-      const keep = t < 30.0;
-      text(keep ? id : null, s, RC.x, y + 12 * (1 - out3(seg(t, ta, ta + 0.25))), { size: 30, weight: 700, color: C.ink, align: 'center', alpha: a });
-      text(keep ? id + '-s' : null, sub, RC.x, y + dy + 12 * (1 - out3(seg(t, ta, ta + 0.25))), { size: 22, weight: 500, color: C.ink2, align: 'center', alpha: a });
-    };
-    lab('part-hub', PARTS[1], '논문으로 만든 Workflow를 공유하고 고쳐 갑니다', 300, 15.8, 38);
-    lab('part-sys', PARTS[0], '내 서재에서 분석하고 기록합니다', 878, 16.3, 38);
+      const p = PART[key], y = 900 + 12 * (1 - out3(seg(t, ta, ta + 0.25))) + 14 * seg(t, 29.3 + 0.06 * i, 29.5 + 0.06 * i), keep = t < 29.3;
+      ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = p.color; ctx.lineWidth = key === 'me' ? 3 : 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(x + 14, y - 10, 13, rad(200), rad(340)); ctx.stroke(); ctx.restore();
+      text(keep ? `legend-${key}` : null, p.name, x + 40, y, { size: 28, weight: 700, color: C.ink, alpha: a });
+      text(keep ? `legend-${key}-d` : null, p.desc, x, y + 36, { size: 21, weight: 500, color: C.ink2, alpha: a });
+    });
   }
   function drawCycleDot(t) {
     let p, r = 11;
     if (t < T.ring) return;
     if (t < T.ringDraw) {
-      const u = inOut(seg(t, T.ring, T.ringDraw)), a = STATUS, b = stationPos(ST_ANG[0]);
+      const u = inOut(seg(t, T.ring, T.ringDraw)), a = STATUS, b = worldPos(ST_ANG[0], t);
       p = { x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u) - 140 * Math.sin(u * Math.PI) }; r = lerp(8, 11, u);
-    } else p = stationPos(dotAngle(t));
+    } else p = worldPos(dotAngle(t), t);
     if (t > T.end) return;
-    // trail behind the dot while it moves along the ring
-    if (t >= T.ringDraw) {
+    if (t >= T.ringDraw) { // trail where the dot moves on screen (ring draw, and orbiting after the lap)
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
-      for (let i = 1; i <= 8; i++) { const q = stationPos(dotAngle(t - i * 0.025)); ctx.globalAlpha = 0.18 * (1 - i / 9); ctx.fillStyle = C.sig; ctx.beginPath(); ctx.arc(q.x, q.y, r * (1 - i / 12), 0, 7); ctx.fill(); }
+      for (let i = 1; i <= 8; i++) { const ti = t - i * 0.025, q = worldPos(dotAngle(ti), ti); ctx.globalAlpha = 0.18 * (1 - i / 9); ctx.fillStyle = C.sig; ctx.beginPath(); ctx.arc(q.x, q.y, r * (1 - i / 12), 0, 7); ctx.fill(); }
       ctx.restore();
     }
     dot(p.x, p.y, r);
   }
   function drawRows(t) { // HUD: the stations as the cycle reaches them
-    if (t < T.cycle || t > 30.6) return;
+    if (t < T.cycle || t > 31.1) return;
     LEGS.forEach((lg, k) => {
-      const a0 = lg.t + 0.15, ra = 30.0 + 0.0625 * k;
+      const a0 = lg.t + 0.15, ra = 30.45 + 0.0625 * k;
       const a = out3(seg(t, a0, a0 + 0.2)) * (1 - out3(seg(t, ra, ra + 0.15)));
       if (a <= 0) return;
       const dx = -24 * (1 - out3(seg(t, a0, a0 + 0.2))) - 30 * out3(seg(t, ra, ra + 0.15));
-      const y = 250 + 84 * k, x = 112 + dx;
+      const y = 240 + 84 * k, x = 112 + dx, col = PART[ST[lg.st].part].color;
       const active = t >= lg.t - 0.05 && t < (k === 5 ? 29.0 : lg.t + 1.95);
       const keep = t < ra;
-      if (active) { ctx.save(); ctx.globalAlpha = a; dot(x - 18, y - 10, 5); ctx.restore(); }
-      text(keep ? `row-${k}-t` : null, ST[lg.st].name, x, y, { size: 28, weight: 700, color: active ? C.sigInk : C.ink, alpha: a });
-      text(keep ? `row-${k}-c` : null, lg.cap, x, y + 34, { size: 24, weight: 500, color: C.ink2, alpha: a });
+      ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x - 18, y - 10, 5, 0, 7); ctx.fill();
+      if (active) glow(x - 18, y - 10, 26, 0.7);
+      ctx.restore();
+      text(keep ? `row-${k}-t` : null, ST[lg.st].name, x, y, { size: 28, weight: 700, color: active ? C.ink : C.ink2, alpha: a });
+      text(keep ? `row-${k}-c` : null, lg.cap, x, y + 34, { size: 24, weight: 500, color: active ? C.ink2 : C.ink3, alpha: a });
     });
   }
   function takeIndex(lg, t) { const tk = TAKES[lg.take]; if (!tk) return -1; return clamp(Math.floor((t - lg.o0) * FPS), 0, tk.n - 1); }
   function windowRect(lg, t, c) {
-    const p = toScreen(c, stationPos(lg.ang).x, stationPos(lg.ang).y);
+    const w = worldPos(lg.ang, t), p = toScreen(c, w.x, w.y);
     const node = { x: p.x - 30, y: p.y - 30, w: 60, h: 60 };
     let e;
     if (t < lg.c0) e = back(seg(t, lg.o0, lg.o0 + 0.25), 1.15);
     else e = 1 - inC(seg(t, lg.c0, lg.c0 + 0.2));
     if (t < lg.o0 || e <= 0.002) return null;
-    return { x: lerp(node.x, WR.x, e), y: lerp(node.y, WR.y, e), w: lerp(node.w, WR.w, e), h: lerp(node.h, WR.h, e), e };
+    return { x: lerp(node.x, WR.x, e), y: lerp(node.y, WR.y, e), w: lerp(node.w, WR.w, e), h: lerp(node.h, WR.h, e), e, p };
   }
   function drawWindows(t, c) {
     if (t < T.cycle - 0.1 || t > 29.3) return;
@@ -615,11 +622,12 @@
     for (const lg of live) {
       const r = windowRect(lg, t, c); if (!r) continue;
       const la = t < lg.c0 ? seg(t, lg.o0 + 0.1, lg.o0 + 0.3) : 1 - seg(t, lg.c0, lg.c0 + 0.08);
-      if (la > 0) { // hairline from the station to its window
-        const p = toScreen(c, stationPos(lg.ang).x, stationPos(lg.ang).y), dx = r.x - p.x, dy = r.y + r.h / 2 - p.y, L = Math.hypot(dx, dy);
-        ctx.save(); ctx.globalAlpha = la; ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(127,162,255,0.45)';
-        ctx.beginPath(); ctx.moveTo(p.x + dx / L * 36, p.y + dy / L * 36); ctx.lineTo(r.x, r.y + r.h / 2); ctx.stroke();
-        ctx.fillStyle = C.sigInk; ctx.beginPath(); ctx.arc(r.x, r.y + r.h / 2, 3.5, 0, 7); ctx.fill(); ctx.restore();
+      const col = PART[ST[lg.st].part].color;
+      if (la > 0) { // short hairline from the station (at 3 o'clock) to its window, outside the ring
+        const p = r.p, ex = r.x, ey = r.y + r.h / 2;
+        ctx.save(); ctx.globalAlpha = la; ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(col, 0.6);
+        ctx.beginPath(); ctx.moveTo(p.x + 36, p.y); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, 7); ctx.fill(); ctx.restore();
       }
       ctx.save();
       panel(r.x, r.y, r.w, r.h, 14 * clamp(r.e), 1, { blur: 50, sy: 20 });
@@ -633,7 +641,11 @@
         const st = ST[lg.st];
         icon(st.icon, r.x + 16, r.y + 11, 18, 'ink2');
         text(null, st.name, r.x + 42, r.y + 26, { size: 17, weight: 650, color: C.ink });
-        text(null, PARTS[st.part], r.x + r.w - 16, r.y + 26, { size: 15, weight: 600, color: C.ink3, align: 'right', ls: 0.4 });
+        if (st.part !== 'me') {
+          const pw = measure(PART[st.part].name, 15, 650);
+          ctx.save(); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(r.x + r.w - 26 - pw, r.y + 21, 4, 0, 7); ctx.fill(); ctx.restore();
+          text(null, PART[st.part].name, r.x + r.w - 16, r.y + 26, { size: 15, weight: 650, color: C.ink2, align: 'right' });
+        }
       }
       ctx.restore();
     }
@@ -728,7 +740,7 @@
       ctx.beginPath(); ctx.ellipse(E.x, E.y, E.a, E.b, E.rot, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
     }
     // the dot keeps orbiting, then merges into the mark
-    const ph = rad(dotAngle(t));
+    const ph = rad(dotAngle(t) + ringRot(t));
     const dr = 11 * (1 - inC(seg(t, 36.6, 36.9)));
     if (dr > 0.3) { const ca = Math.cos(E.rot), sa = Math.sin(E.rot), ex = E.a * Math.cos(ph), ey = E.b * Math.sin(ph); dot(E.x + ex * ca - ey * sa, E.y + ex * sa + ey * ca, dr); }
     // lockup revealed by light: unlit pixels at a few percent
@@ -810,6 +822,7 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     drawWindows(t, c);
     drawRows(t);
+    drawLegend(t);
     drawEnd(t, c);
     drawHeadlines(t);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
