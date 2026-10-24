@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-24T02:31:20Z
+status: active
+updated: 2026-10-24T02:45:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"a40bea4b-32d3-43d4-86f1-faa4a73d4a0a","pid":1127991,"provider":"claude","session":"012393d4-bfa3-4202-9c56-0c5c032003d1","start":"69413115","token":"6efd65ed0c26adb861904a36c68e3a3d1ccd1486b88a96f826851f987d1a58fb"}
 branch: task/gaid-cite-open-pdf
 target: main
@@ -39,10 +39,13 @@ after integration. Outside check: none.
   page positions read from the DOM (p. 3 → 3, pp. 5-6 → 5, p. 14 of 8 → 1); 24 screenshots (2 styles × 2 themes ×
   1440×900/1280×800; workspace, failure popover, 서재) in `.../playwright/matrix/` with `matrix.sha256`.
 - Tests: web `src/geo/library/citation-pdf.test.tsx`, `src/geo/contracts/library.test.ts`; server `geo-library*.test.ts`.
-- scripts/check (2026-10-24): backend typecheck + 2300 tests passed; frontend 1290 passed, 8 timed out (5 s) while
-  the PC load average was 55 on 32 threads; those 5 files rerun alone: 57/57 passed. The steps after frontend tests
-  (start.sh --check, geo/tests, copy validator 0 errors, check-ui 0 errors, environments smoke, start-gaid.sh --check,
-  production smoke PASS) ran in the same order and passed. Logs: ~/data/geoaidesk/work/gaid-cite-open-pdf/logs/.
+- scripts/check (2026-10-24): first full run: backend typecheck + 2300 tests passed; frontend 8 tests timed out (5 s)
+  under load average 55 on 32 threads, the 5 files rerun alone 57/57. The `task finish` run: backend and frontend
+  (1298/1298) passed, then `geo/tests/distribution.test.mjs` failed because the new boundaries owner
+  `gaid-cite-open-pdf` was missing from its owner list (an earlier manual run of the later steps hid that failure: its
+  `set -e` did not stop the group). Fixed by adding the owner; the steps after frontend tests then each exited 0
+  (start.sh --check, geo/tests, copy validator, check-ui, environments smoke, start-gaid.sh --check, production smoke).
+  Logs: ~/data/geoaidesk/work/gaid-cite-open-pdf/logs/ (check.log, check-rest2.log).
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-24T02:31:20Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
