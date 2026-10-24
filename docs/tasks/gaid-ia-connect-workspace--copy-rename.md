@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T06:56:12Z
+status: done
+updated: 2026-10-24T12:01:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c0846cc2-2d3c-4451-a536-928158b01728","pid":1419314,"provider":"codex","session":"01a16c9f-037c-7000-9c73-3a2648766336","start":"71166182","token":"eb92e9d2636de378ea79a8a04d9e6f61f7cc7146a51b50e547fadd07a2f678b8"}
 branch: task/gaid-ia-connect-workspace--copy-rename
 target: task/gaid-ia-connect-workspace
@@ -38,7 +38,7 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 - UI guide sections 1, 2 and 10, copy guidelines, terminology, parent report §3.6–3.7 and relevant ADRs were read before changes. Domain-modeling and humanizer file mode were applied to the current docs. Historical ADR content and user quotations remain intact.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T06:56:12Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T12:01:31Z: integrated into gaid-ia-connect-workspace; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - `task job run` refused dependency installation while source edits were dirty (`job source dirty; save first`); checkpoint reviewed changes before launching checks. No install job started.

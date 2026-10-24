@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T11:23:32Z
+status: done
+updated: 2026-10-24T12:01:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -38,7 +38,7 @@ Code is on this child branch; parent integration remains separate. First automat
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T11:23:32Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T12:01:31Z: integrated into gaid-ia-connect-workspace; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Third finish (VITEST_MAX_WORKERS=1) exited 1; log ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-1mk4i0ag.log. The sole failure was the owned repeat-citation test: a rows-dependent effect could restore the old citation over a manually selected paper after an async list settled. Fix: mark each citation request handled once and invalidate pending detail responses on manual selection; search/list refresh keeps the user's selection. Strengthened the existing regression test with a server-search refresh before repeating the citation.
