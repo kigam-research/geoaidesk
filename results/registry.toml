@@ -145,3 +145,26 @@ files = [{ path = "gaid-promo-v4.mp4", sha256 = "5f6d50ca02a4364363b01ca2f430c1e
 report = "reports/2026-10-24-gaid-promo-video-v4/index.md"
 replicas = []
 supersedes = "gaid-promo-video-v3"
+
+[[result]]
+id = "gaid-promo-video-v5"
+title = "GAID 홍보 영상 v5 — 포천 PGI와 Yilgarn 니켈 예제, 화면 요소를 통째로 감싼 강조 상자, 설명 열과 창 배치의 93초 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021454.162971Z/out"
+source_sha = "528f09e8c097c08717de6efb13ffd7ec525b5391"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/capture.json", "user:2026-10-24-gaid-promo-video-v4-feedback"]
+files = [{ path = "gaid-promo-v5.mp4", sha256 = "0e5126b80a21ed1ab748cc6258652e6817276d5b5eaf38d66d55b7e6576d05ff" }, { path = "manifest.json", sha256 = "cd2a2e82755d26d54d82aecf522f3e31e132e45361efbb3fb1a5195b4446e3f1" }]
+report = "reports/2026-10-24-gaid-promo-video-v5/index.md"
+replicas = []
+supersedes = "gaid-promo-video-v4"
+
+[[result]]
+id = "gaid-promo-video-v5-day45"
+title = "GAID 45초 제품 영상 — 한 연구자의 하루를 코드로만 그린 모션그래픽과 합성 음악·효과음 (내부 검토용)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T023841.916242Z/out"
+source_sha = "f69be169f088419bf4df18d61bd4bff97d67aad9"
+inputs = ["user:2026-10-24-gaid-promo-video-v5-product-film"]
+files = [{ path = "gaid-day45.mp4", sha256 = "b550272a86533f0e131544dcb90bc6cedd97d7099d89704fddd93422fe18d5fb" }, { path = "manifest.json", sha256 = "0879a90befd38246e01fd601acf2ef1ea4a2328275b811a8359ca664a8f69c1a" }, { path = "soundtrack.wav", sha256 = "dad29a2dd03d8e05155e54e600913424181f3717291e377e6506a25c8a8ad27a" }]
+report = "reports/2026-10-24-gaid-promo-video-v5/index.md"
+replicas = []
