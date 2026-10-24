@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:51:55Z
+updated: 2026-10-24T02:04:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7b6c0c70-dc29-4c26-aee1-6a9e2549e4b2","pid":1222631,"provider":"codex","session":"01a16b9a-30c0-7823-bbfa-e604026a2474","start":"69456843","token":"8d41e205d92dc2e9f2d13e4620748ccd6276cd4ae4f4294f054d0afbb6e2d1fb"}
 branch: task/gaid-promo-video-v5--capture
 target: task/gaid-promo-video-v5
@@ -54,10 +54,14 @@ frame. Commit only `geo/promo/capture_v5*.py` and `geo/promo/CAPTURE.md` (plus y
 If a take cannot show its state cleanly, deliver the others and report that take with the reason.
 
 ## Current state
-Read the v5 contract and existing v3 capture helpers. Implemented a strict read-only capture controller with whole-element geometry and full inventory hashes. No app writes are authorized.
+Y1–Y7 captured: 1,081 frames / 36.033 s, 16 whole-element beats. capture_verify.py and capture_v5_verify.py pass. All 16 drawn midpoint frames and all first/middle/last frames inspected. Geometry QA found outside list markers on the final note highlight; switch that highlight to the complete decision-status heading/paragraph. Y4 will retain original composer connection status; no DOM masks. Inventory 1,641 before/after: only library/zotero.json changed; all project and skill-hub files unchanged. GET /geo/library calls refreshIfStale (server source), so browser write blocking cannot guarantee literal full-store immutability. No model run or Workflow start occurred.
 ## Next steps
-1. Launch the recorded controller job, stage Y1–Y7, measure and inspect every beat, then verify payloads and inventory.
+1. Measure the final note decision-status element, update its beat, recheck drawn frame, record full evidence and finish.
 ## Failed approaches
+- First job launch refused dirty source; saved reviewed helper before launching job 1.
+- First map manifest request was blocked; confirmed /geo/result is read-only and explicitly allowlisted it.
+- Start-window selections are role=radio and stage controls role=tab, not button; inspected outerHTML and corrected locators after two failed button lookups.
+- Initial Y3 inherited Cu-PGE settings; archived outside Git and recaptured using locally selected Ni/komatiite. Never started.
 ## Notes and decisions
 - Sequential work: browser guard/inventory → UI staging and capture → midpoint geometry inspection → evidence and finish. Single writer owns only capture_v5*.py, CAPTURE.md v5 section and this task document. Parent owns film integration; no further child units.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
@@ -74,6 +78,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5--capture-20261024T015207.627452Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

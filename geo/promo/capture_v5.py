@@ -20,7 +20,7 @@ from capture_study import StudyTake
 
 WORK = Path.home() / 'data/geoaidesk/work/gaid-promo-video-v5'
 OUT = WORK / 'capture-v5'
-READ_POST = re.compile(r'^/geo/(?:inspect|vector-page|raster-[a-z-]+|series-window)$')
+READ_POST = re.compile(r'^/geo/(?:inspect|result|vector-page|raster-window|raster-style|raster-point|series-window)$')
 SKIP = {'auth.json','config.env','mcp-auth.json','connection.json'}
 
 
@@ -84,14 +84,18 @@ def main():
         manifest.write_text(json.dumps({'schema':'gaid-promo-capture-v2','fps':FPS,'width':PX_W,'height':PX_H,
             'css':{'width':CSS_W,'height':CSS_H,'scale':SCALE},
             'app':{'url':'http://127.0.0.1:3000','commit':'7650e012'},'shots':[],'stills':[]},indent=2)+'\n')
-    errors,console_errors,blocked,allowed = [],[],[],[]
+    previous=json.loads(manifest.read_text())
+    errors=previous.get('browser_errors',[])
+    console_errors=previous.get('console_errors',[])
+    blocked=previous.get('requests',{}).get('blocked',[])
+    allowed=previous.get('requests',{}).get('allowed',[])
     with sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True,executable_path='/usr/bin/google-chrome',args=['--no-sandbox','--disable-dev-shm-usage'])
         ctx=browser.new_context(viewport={'width':CSS_W,'height':CSS_H},device_scale_factor=SCALE,locale='ko-KR',timezone_id='Asia/Seoul',color_scheme='light')
         ctx.add_init_script("localStorage.setItem('gaid:locale','ko');localStorage.setItem('theme','light');localStorage.setItem('gaid:style','instrument');")
         def guard(route):
             req=route.request; path=urlsplit(req.url).path
-            if req.method in ('PUT','DELETE') or (req.method=='POST' and not READ_POST.fullmatch(path)):
+            if req.method in ('PUT','DELETE','PATCH') or (req.method=='POST' and not READ_POST.fullmatch(path)):
                 blocked.append({'method':req.method,'path':path})
                 return route.fulfill(status=200,content_type='application/json',body='{}')
             if req.method=='POST': allowed.append({'method':req.method,'path':path})
