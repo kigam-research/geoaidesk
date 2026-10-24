@@ -55,11 +55,11 @@ async function call<T>(path: string, init?: RequestInit, projectId?: string): Pr
   return body as T;
 }
 
-export function listLibrary(query: LibraryListQuery = {}): Promise<LibraryListResponse> {
+export function listLibrary(query: LibraryListQuery = {}, projectId?: string): Promise<LibraryListResponse> {
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(query)) if (v !== undefined && v !== "") params.set(k, String(v));
   const qs = params.toString();
-  return call(qs ? `?${qs}` : "");
+  return call(qs ? `?${qs}` : "", undefined, projectId);
 }
 
 export const getLibraryItem = (id: string) => call<LibraryItemResponse>(`/items/${encodeURIComponent(id)}`);

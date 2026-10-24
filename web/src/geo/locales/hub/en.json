@@ -654,8 +654,8 @@
     "saving": "Saving"
   },
   "library": {
-    "title": "Add sources from the library",
-    "description": "Papers go in with their PDF text, research notes with their text and figures. A paper without a PDF goes in with its reference and abstract only.",
+    "title": "Choose sources from the library",
+    "description": "Add papers and research notes as evidence for the Workflow.",
     "category": "Source type",
     "papers": "Papers",
     "notes": "Research notes",
@@ -666,12 +666,15 @@
     "emptyNotes": "The library has no research notes. Bring them in from the research notes screen.",
     "selected": "{count} selected",
     "cancel": "Cancel",
-    "addAction": "Add {count}",
+    "addAction": "Add {count} sources",
     "adding": "Adding",
     "skipped": "{count, plural, one {# item was} other {# items were}} not added.",
     "otherPc": "Note on another PC",
     "noPdf": "No PDF",
-    "addEmpty": "Add"
+    "addEmpty": "Add sources",
+    "close": "Close library panel",
+    "failed": "Could not read the library. Open it again shortly.",
+    "addFailed": "Could not add the sources. Try again."
   },
   "stages": {
     "title": "Check the Workflow stages",

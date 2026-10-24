@@ -1081,6 +1081,12 @@
       "owner": "gaid-cite-open-pdf",
       "status": "edited",
       "responsibility": "서재 citations open their PDF page: MessageResponse gains an opt-in `libraryCitations` prop (rehype pass `libraryCitationLinks` after harden, `button` mapped to `CitationButton`, web/src/geo/library/citation-links.tsx); chat assistant text turns it on; the workspace provides `CitationPdfContext` and shows `CitationPdfPane` as a column between the preview and the chat."
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/components/chat-tabs-bar.tsx, web/src/lib/workspace-persistence.ts, web/src/lib/workspace-persistence.test.ts",
+      "owner": "gaid-ia-connect-workspace",
+      "status": "edited",
+      "responsibility": "Project library inspector, explicit switch beside Workflows, and persistence of its library view."
     }
   ],
   "notTouched": [
