@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:00:35Z
+updated: 2026-10-24T07:08:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8326432c-0a38-43d0-92f0-76db7e868732","pid":1778976,"provider":"claude","session":"21c916ad-8c56-4943-818b-6f9dae6aa973","start":"71313221","token":"dd814f54f4df4db1c88c4132afa7ed1942ef6ba2f237a42360f61d5b48b0e522"}
 branch: task/gaid-input-fallback
 target: main
@@ -47,9 +47,19 @@ Coordinate: gaid-ia-connect-workspace (and children) is reshaping the Workspace 
 integration if it lands first. Do not touch the review app or the hub server. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Plan (2026-10-24, writer): small, tightly coupled change; done by this writer, no child units.
+- Contract: `WorkflowDocSettings.fallbacks` (`InputFallback {kind: search|synthetic|instruction, note?}`) in
+  `web/src/geo/contracts/workflow-doc.ts`; rendered as a "자료가 없는 입력" section with per-kind agent rules (interview first,
+  candidates with source/licence/size, no download without choice, >100 MB/unclear licence refused, files in
+  `toy_data/<role>/` or `synthetic_data/<role>/` with SOURCE.md/README.md, toy/synthetic labelled in answer, files and note).
+  Block attribute `fallback="<role>=<kind>;…"` (optional; older blocks parse unchanged). Agent-written files are recorded by
+  the existing provenance recorder (write/bash scan); `user_data/` is guard-protected, hence the new top-level folders.
+- UI: `InputAnswer` mode `fallback` in `setup-steps.tsx` (three option cards under "내 자료가 없을 때", open when no fitting
+  file and no example, folded otherwise); summary rows + summary notice in `task-setup.tsx`; card badge in `workflow-card.tsx`.
+- Files owned: workflow-doc.ts, render.ts, setup-steps.tsx, task-setup.tsx, workflow-card.tsx, locales workspace/workflowDoc,
+  tests. Avoids gaid-ia-connect-workspace files (its copy-rename child edits other keys of the same locale files).
 ## Next steps
-1. (the next session's first action)
+1. Implement contract + renderer + UI, tests, scripts/check, real-app check, report.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.

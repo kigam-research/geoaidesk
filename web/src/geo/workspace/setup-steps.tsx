@@ -13,14 +13,16 @@ import { hasGeoText, t } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 import { isExamplePath, sizeText } from "@/geo/contracts/workflow-examples";
 import { workflowStages } from "@/geo/contracts/workflow-stages";
+import { INPUT_FALLBACK_KINDS, type InputFallbackKind } from "@/geo/contracts/workflow-doc";
 import { accepts, text } from "./api";
 import { ClampedText } from "./start-intro";
 
 /**
  * An input role answer: a fitting file, another project file, several files (a `multiple` input), the Workflow's example
- * data, or (optional roles only) not used.
+ * data, no data with how the AI agent fills it (`fallback`, gaid-input-fallback), or (optional roles only) not used.
  */
-export type InputAnswer = { mode: "file" | "other"; path: string } | { mode: "files"; paths: string[] } | { mode: "example" } | { mode: "none" };
+export type InputAnswer = { mode: "file" | "other"; path: string } | { mode: "files"; paths: string[] } | { mode: "example" }
+  | { mode: "fallback"; kind: InputFallbackKind; note: string } | { mode: "none" };
 /** An analysis condition answer: a listed option, own text, or decided in the chat (`defer`). */
 export type ChoiceAnswer = { mode: "option" | "other"; value: string } | { mode: "defer" };
 
@@ -93,9 +95,13 @@ export function stageHint(counts: { inputs: number; choices: number; defaults: n
   ].filter(Boolean).join(" · ");
 }
 
-/** A required input needs a file; an "other" answer needs its text. Unanswered conditions are decided in the chat. */
+/**
+ * A required input needs a file; an "other" answer needs its text, a separate instruction its instruction. Unanswered
+ * conditions are decided in the chat.
+ */
 export function inputDone(answer: InputAnswer | undefined): boolean {
   if (answer?.mode === "files") return answer.paths.length > 0;
+  if (answer?.mode === "fallback") return answer.kind !== "instruction" || answer.note.trim().length > 0;
   return Boolean(answer && (answer.mode === "none" || answer.mode === "example" || answer.path));
 }
 
@@ -231,6 +237,40 @@ function ExampleHint({ role }: { role: WorkflowInputRole }) {
   return <span className="flex flex-col gap-0.5">{lines.map((line) => <span key={line}>{line}</span>)}</span>;
 }
 
+/**
+ * "내 자료가 없을 때" (gaid-input-fallback): the AI agent finds similar public data, generates synthetic data, or follows
+ * the researcher's instruction; it asks at the start before acting. Open when the project has no fitting file and the
+ * Workflow no example, else folded. Nothing is pre-selected (UI guide Q2: no reason to recommend one).
+ */
+function FallbackOptions({ answer, onAnswer, open }: { answer: InputAnswer | undefined; onAnswer: (answer: InputAnswer) => void; open: boolean }) {
+  const chosen = answer?.mode === "fallback" ? answer : null;
+  const [picked, setPicked] = useState(false);
+  const cards = INPUT_FALLBACK_KINDS.map((kind) => {
+    const selected = chosen?.kind === kind;
+    const note = selected ? chosen!.note : "";
+    return <OptionCard key={kind} selected={selected} onSelect={() => { setPicked(true); onAnswer({ mode: "fallback", kind, note: chosen?.note ?? "" }); }}
+      title={t(`workspace.setup.fallback.${kind}.title`)} hint={t(`workspace.setup.fallback.${kind}.hint`)}>
+      {kind === "instruction"
+        ? <textarea autoFocus={picked} rows={2} aria-label={t("workspace.setup.fallback.instruction.title")} className={fieldClass} value={note}
+          placeholder={t("workspace.setup.fallback.instruction.placeholder")} onChange={(event) => onAnswer({ mode: "fallback", kind, note: event.target.value })} />
+        : <input autoFocus={picked} aria-label={t(`workspace.setup.fallback.${kind}.noteLabel`)} className={fieldClass} value={note}
+          placeholder={t(`workspace.setup.fallback.${kind}.placeholder`)} onChange={(event) => onAnswer({ mode: "fallback", kind, note: event.target.value })} />}
+    </OptionCard>;
+  });
+  const heading = t("workspace.setup.fallback.heading");
+  if (open) return <>
+    <p className="flex items-baseline gap-1.5 pt-1 text-[13px] font-semibold text-gaid-ink-2">{heading}</p>
+    {cards}
+  </>;
+  return <details open={Boolean(chosen)} className="group">
+    <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-md border border-dashed border-gaid-edge px-3 py-2 text-sm text-gaid-ink-2 select-none [&::-webkit-details-marker]:hidden">
+      <ChevronRightIcon className="size-3.5 transition-transform group-open:rotate-90" aria-hidden />
+      {heading}
+    </summary>
+    <div className="mt-2 space-y-2">{cards}</div>
+  </details>;
+}
+
 export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3, compact = false }: {
   role: WorkflowInputRole; files: string[]; answer: InputAnswer | undefined; onAnswer: (answer: InputAnswer) => void;
   /** Upload the researcher's own files into the project; resolves to the saved project paths. */
@@ -328,6 +368,7 @@ export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3, 
         <option value="">{t("workspace.setup.input.addOther")}</option>
         {others.filter((path) => !picked.includes(path)).map((path) => <option key={path} value={path}>{path}</option>)}
       </select>}
+      <FallbackOptions answer={answer} onAnswer={onAnswer} open={fitting.length === 0 && !role.example} />
       {!role.required && <OptionCard selected={answer?.mode === "none"} onSelect={() => onAnswer({ mode: "none" })} title={t("workspace.setup.input.none")} />}
       </>}
     </div>
@@ -413,6 +454,8 @@ export function StagePage({ page, files, inputs, choices, recipeChoices, onInput
 export function inputValue(answer: InputAnswer | undefined, role?: WorkflowInputRole): string | null {
   if (!answer) return null;
   if (answer.mode === "example") return t("workspace.setup.example.value", { title: role ? exampleTitle(role) : "" });
+  if (answer.mode === "fallback") return answer.kind === "instruction" && answer.note.trim()
+    ? t("workspace.setup.fallback.instruction.value", { note: answer.note.trim() }) : t(`workspace.setup.fallback.${answer.kind}.value`);
   if (answer.mode === "files") return answer.paths.length > 1 ? t("workspace.setup.input.files", { first: baseName(answer.paths[0]), rest: answer.paths.length - 1 }) : answer.paths.length ? baseName(answer.paths[0]) : null;
   return answer.mode === "none" ? t("workspace.setup.input.none") : answer.path ? baseName(answer.path) : null;
 }
