@@ -15,10 +15,11 @@ const text = geoText("library");
 const PAGE_SIZE = 100;
 
 /** The project's citation scope, including attached folders and their descendants, beside the work it supports. */
-export function ProjectLibraryPanel({ projectId, selectedId, citedPage, onOpenPdf }: {
+export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citationSequence, onOpenPdf }: {
   projectId: string;
   selectedId?: string;
   citedPage?: number;
+  citationSequence?: number;
   onOpenPdf: (item: LibraryItemSummary, page: number) => void;
 }) {
   const [scope, setScope] = useState<"project" | "all">("project");
@@ -79,7 +80,7 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, onOpenPd
         used: { notes: 0, projects: 0, workflows: 0 }, metadataConfirmed: item.metadataConfirmed, addedAt: item.addedAt, kind: "paper" });
     }).catch(() => { if (active) setError(text("panel.failed")); });
     return () => { active = false; };
-  }, [selectedId, rows]);
+  }, [selectedId, citationSequence, rows]);
 
   return (
     <section aria-label={text("panel.title")} className="flex min-h-0 flex-1 flex-col bg-gaid-face">

@@ -470,7 +470,6 @@
     "attached": "Added to project",
     "attachFailed": "Could not add the paper. Try again.",
     "fullScreen": "Full library",
-    "more": "Show more papers",
-    "refine": "Narrow the search"
+    "more": "Show more papers"
   }
 }

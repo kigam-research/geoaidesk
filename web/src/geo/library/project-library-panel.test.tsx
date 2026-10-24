@@ -54,6 +54,15 @@ describe("project library inspector", () => {
     await waitFor(() => expect(listLibrary).toHaveBeenCalledWith(expect.objectContaining({ q: "시추", offset: 0 }), "a"));
   });
 
+  it("selects the cited paper again when the same citation is pressed after browsing another paper", async () => {
+    const { rerender } = render(<ProjectLibraryPanel projectId="a" selectedId="p1" citationSequence={1} onOpenPdf={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "전체 서재" }));
+    fireEvent.click(await screen.findByRole("button", { name: /단층의 수리 특성/ }));
+    expect(screen.getByRole("button", { name: /단층의 수리 특성/ })).toHaveAttribute("aria-pressed", "true");
+    rerender(<ProjectLibraryPanel projectId="a" selectedId="p1" citationSequence={2} onOpenPdf={vi.fn()} />);
+    expect(screen.getByRole("button", { name: /포천 자력 이상 연구/ })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("shows a readable failure and allows retry without exposing a raw server error", async () => {
     listLibrary.mockRejectedValue(new Error("/private/cache internal stack"));
     render(<ProjectLibraryPanel projectId="a" onOpenPdf={vi.fn()} />);

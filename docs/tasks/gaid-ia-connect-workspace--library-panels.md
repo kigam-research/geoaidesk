@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:43:23Z
+updated: 2026-10-24T06:49:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -28,35 +28,53 @@ Rules: follow AGENTS.md of your worktree (UI guide v2 sections 1, 2, 10 before U
 Evidence: run the relevant checks (cd server && npm run typecheck && npm test -- <your tests>; cd web && npx tsc --noEmit && npm test -- <your tests>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs). Full scripts/check is run by the parent after integration; you may run it if time allows. Record in your task document what you changed and the check results, then task finish.
 
 ## Current state
-Implementation and scoped tests complete; visual checks next. Existing GET /geo/library?filter=project already expands attached folders and descendants; no server route needed. Citation frequency is omitted because summary counts are global, not project-specific.
+Implemented the two library side panels. Workspace now has a library view beside chat and Workflows, project-scoped paper search/list, add-to-project, stored-PDF actions and full-screen library navigation. Chat/note citations open the existing PDF column and select the library paper (including repeat presses). The library view survives workspace restoration. Connect source selection is a non-modal 440 px side panel, an overlay below 1280 px, with unchanged multi-source add behavior, close/Escape and restored keyboard focus.
+
+Existing GET /geo/library?filter=project expands attached folders and descendants; no server route was added. Citation frequency is intentionally omitted because available summary counts are global, not project-specific.
+
+Scoped verification: web component/PDF/persistence tests 30/30; server library/folder tests 13/13; both typechecks; copy validator 0 errors (101 existing warnings); UI validator 0 errors (78 existing accepted debt). Korean screenshots cover both panels × both styles × both themes at 1440×900 and 1280×800 (16), plus 1100×800 instrument/light (2). Screenshots use the implemented components with intercepted sample API replies over the approved static surrounding context, not a live researcher project. No browser console errors in the final session. No user data, review app or hub server was touched.
+
+Code is on this child branch; parent integration and its full scripts/check remain separate. No deployment is part of this unit.
+
 ## Next steps
-1. Capture the implemented panels in the browser, inspect both sizes, then review the final diff.
-2. Capture both panels in Korean across both styles/themes and two desktop sizes; run scoped checks, then finish.
+1. Parent: run task complete gaid-ia-connect-workspace--library-panels, integrate the checked child, and run the declared full scripts/check.
+2. Parent: incorporate the implementation result and figures 08/09 into the one canonical parent report. The child did not edit its prose concurrently.
+
 ## Failed approaches
 - Initial tsc invocation found no dependencies (no node_modules). Installed pinned dependencies with npm ci via recorded job -1, exit 0. Initial job run refused dirty source before starting; saved then ran the recorded install.
+- Initial screenshot attempt on 127.0.0.1 could not hydrate because Next dev blocked the HMR origin; used localhost (no product configuration change).
 - First picker test exposed a missing space in the segmented control accessible name; added an explicit separator. Recheck passed.
 ## Notes and decisions
 - Sequential plan: reuse the library API and PDF state; build the project panel; integrate the right-pane switch; convert the authoring picker; test and capture. No independent writer package remains within this child unit. Owned interfaces: panel PDF callback, listLibrary optional projectId, unchanged picker onAdd contract.
 - Minimal additional seams: library/api.ts adds explicit project scope; citation-pdf.tsx opens stored PDFs by item (including papers without a citation key); workspace-persistence.ts retains the new library view.
-- UI rules to verify: D6, G1, G6, L1, B1, P4, R2, I6, I9/I14.
+- UI rules followed: D6/P4 (side inspector, work remains visible), G1 (56 px two-line rows, title ellipsis and full title tooltip in the project panel), G6/I9/I14 (announced selected state plus identity cue), L1 (440 px alongside at >=1280, overlay below), B1 (one filled picker add action; project PDF/attach remain secondary), R2 (readable failure without raw errors), I6 (existing original-pixel PDF pane), A1/A2 (named controls, checkbox and Escape/focus return). No intentional rule exception.
+- Visual checklist: 18 captures showed no document overflow. Project selected-paper/PDF and picker primary actions stay visible at both required sizes. Final capture fixed the picker height to the available pane and its selected-row index cue.
+- Screenshot evidence: ~/data/geoaidesk/work/gaid-ia-connect-workspace--library-panels/{project,authoring}-{instrument,mapsheet}-{light,dark}-{1440x900,1280x800}.png; 1100x800 instrument/light also captured. capture.cjs and screenshot-harness.tsx remain there for reproduction. The temporary /dev/library-panels source route was removed.
+- In-repo report figures: reports/2026-10-24-gaid-ia-connect-workspace/figures/08-project-library-implemented.png and 09-authoring-library-implemented.png (instrument/light, 1440x900). Parent owns the report prose and main integration.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
-- Checks: web npx tsc --noEmit passed; web scoped component/PDF/persistence suite 29/29 passed; server npm run typecheck passed; geo-library and geo-library-folders 13/13 passed. Copy validator: 0 errors, 101 existing warnings; UI validator: 0 errors, 78 accepted debt.
-- Screenshot plan: temporary dev-only harness renders the implemented components on the approved static context, with browser-intercepted library API fixtures. No user data, review app, or hub server is touched.
+- Checks: web npx tsc --noEmit passed; web scoped component/PDF/persistence suite 30/30 passed; server npm run typecheck passed; geo-library and geo-library-folders 13/13 passed. Copy validator: 0 errors, 101 existing warnings; UI validator: 0 errors, 78 accepted debt.
+- Screenshot method: temporary dev-only harness renders the implemented components on the approved static context, with browser-intercepted library API fixtures. No user data, review app, or hub server is touched.
 
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-24-gaid-ia-connect-workspace/index.md
+Parent-owned canonical report; implementation figures added, prose integration deferred to the parent to avoid concurrent edits.
+
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ia-connect-workspace--library-panels-20261024T064045.938876Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-ia-connect-workspace--library-panels-20261024T064336.499685Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+## Copy changes (Korean first; English equivalent)
+- New library.panel.* (19 ids): scope/title, search/loading/empty/failure/retry, PDF page, attach states, full-screen link and pagination. Examples: project = "프로젝트 문헌 {count}" / "Project papers {count}"; attach = "프로젝트에 넣기" / "Add to project"; fullScreen = "서재 전체 화면" / "Full library". No previous values.
+- hub.library.title: "서재에서 자료 추가" / "Add sources from the library" -> "서재에서 자료 고르기" / "Choose sources from the library".
+- hub.library.description: multi-sentence PDF/note detail -> one-line "논문과 정리 노트를 Workflow의 근거 자료로 넣습니다." / "Add papers and research notes as evidence for the Workflow." Source ingestion behavior is unchanged.
+- hub.library.notes: "연구 노트" -> "정리 노트" (English "Research notes" unchanged).
+- hub.library.addAction: "{count}개 추가" / "Add {count}" -> "자료 {count}개 더하기" / "Add {count} sources"; addEmpty: "추가" / "Add" -> "자료 더하기" / "Add sources".
+- New hub.library.close, failed, addFailed: close action and readable list/add failure messages, with matching English. Existing raw error output removed from this picker.

@@ -1339,7 +1339,7 @@ function WorkspacePage({
 
           <div className={cn("min-h-0 flex-1 flex-col", view === "library" ? "flex" : "hidden")}>
             <ProjectLibraryPanel projectId={projectId} selectedId={citationPdf.pdf?.itemId}
-              citedPage={citationPdf.pdf?.page} onOpenPdf={citationPdf.openItem} />
+              citedPage={citationPdf.pdf?.page} citationSequence={citationPdf.pdf?.sequence} onOpenPdf={citationPdf.openItem} />
           </div>
 
           {/* Workflows view */}

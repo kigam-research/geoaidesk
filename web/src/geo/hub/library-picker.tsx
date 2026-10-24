@@ -105,7 +105,7 @@ export function LibrarySourcePicker({
   if (!open) return null;
   return (
     <aside aria-label={text("library.title")}
-      className="absolute inset-y-0 right-0 z-30 flex w-[min(440px,100%)] shrink-0 flex-col gap-4 overflow-hidden border-l border-gaid-edge bg-gaid-face p-4 shadow-[var(--gaid-shadow-overlay)] xl:static xl:w-[440px] xl:shadow-none">
+      className="absolute inset-y-0 right-0 z-30 flex h-full w-[min(440px,100%)] shrink-0 flex-col gap-4 overflow-hidden border-l border-gaid-edge bg-gaid-face p-4 shadow-[var(--gaid-shadow-overlay)] xl:static xl:w-[440px] xl:shadow-none">
         <header>
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-base font-semibold">{text("library.title")}</h2>
@@ -162,7 +162,7 @@ export function LibrarySourcePicker({
               const Icon = categoryOf(r) === "note" ? NotebookTextIcon : BookOpenIcon;
               return (
                 <li key={r.id}>
-                  <label className={cn("flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2", on && "bg-gaid-signal-tint")}>
+                  <label className={cn("flex min-h-14 cursor-pointer items-center gap-3 px-3 py-2", on && "gaid-index relative bg-gaid-signal-tint")}>
                     <input type="checkbox" checked={on} onChange={(e) => toggle(r.id, e.target.checked)} />
                     <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                     <span className="min-w-0 flex-1">
