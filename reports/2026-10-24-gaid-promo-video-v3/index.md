@@ -4,12 +4,14 @@ date: 2026-10-24
 project: geoaidesk
 task: gaid-promo-video-v3
 headline: v2의 구성과 연출은 그대로 두고, 시연을 최종 앱에서 포천 자철석 PGI 연구 한 바퀴로 다시 찍었습니다. 서재 옆 PDF, 여러 자료로 만드는 Workflow, 질문 옆 근거 뷰어, 단계별 시작 창과 예제 자료, 근거 논문 인용, 노트를 서재에 넣기, Workflow version이 순환 속 제자리에 나옵니다.
-review_status: pending
+review_status: superseded
 decisions: 0
 cover: figures/02-demo-a.png
 supersedes: 2026-10-23-gaid-promo-video-v2
 ---
 # GAID 홍보 영상 v3: 최종 앱에서 포천 연구 한 바퀴로 다시 찍은 105초 영상 (내부 검토용)
+
+> 이 보고서는 2026-10-24-gaid-promo-video-v4로 대체되었습니다.
 
 ## 0. 한눈에
 
