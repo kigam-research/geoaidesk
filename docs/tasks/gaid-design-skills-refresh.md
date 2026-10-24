@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T02:23:38Z
+status: done
+updated: 2026-10-24T02:23:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1a91e208-7b70-439e-8b39-477b8539d9b0","pid":1214844,"provider":"claude","session":"935f0de9-bf01-4092-ac64-61673682a5ce","start":"69454174","token":"3dff85c378d3f25a9e25cd3e5cb5168bcefd62820b51026e8e6382502701c477"}
 branch: task/gaid-design-skills-refresh
 target: main
@@ -67,7 +67,7 @@ Mockups (code-built from the real tokens/components, no generated images) and th
   smoke PASS; log ~/data/geoaidesk/work/gaid-design-skills-refresh/check.log).
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T02:08:54Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T02:23:39Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
