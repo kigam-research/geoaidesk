@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:30:53Z
+updated: 2026-10-24T01:44:19Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88cca85b-4b8e-4edd-b09b-2d41608083e0","pid":926474,"provider":"claude","session":"fa954eb4-c14c-4138-b556-4c278eaf0e94","start":"69251314","token":"9825be956e484ea4be90d2e182aaed55b5cf2c9ca62fa47c866e8d332f9219cb"}
 branch: task/gaid-promo-video-v4-brag
 target: main
@@ -53,6 +53,14 @@ v4 (gaid-promo-video-v4) is rendered and reported on branch task/gaid-promo-vide
 
 Writer: Opus 5.5 high fast (user). Outside check: none. Tell the hub before any use of the review app (not expected).
 
+## Added scope (user, verbatim 2026-10-24)
+
+> 메시지는 동등해도 되는데 연출은 오히려 더 자유롭게 홍보성으로 만들자. 그리고 분량은 40초로하고 코드로 된 영상 기반으로 전면 새로 만들어도 좋다. 현재 촬영자료가 있다고 너무 v4스타일로 만들필요는없다. 현재 렌더링중인것은 계속만들고 별도로하나더 생성하자.
+
+So two films: (1) v4_brag 100.8 s (render job 1, kept as is); (2) a second, 40 s film made fresh in code with brag-slim:
+same messages, freer promotional direction (kinetic type, motion graphics), real-app frames only as short accents where
+they help. Sources `geo/promo/brag/promo40/`; both films in the one report and registry (two entries, `review`).
+
 ## Current state
 - brag-slim installed user-level: `~/.claude/skills/brag-slim/` (SKILL.md sha256 `42f58aa8a2e0c0c1aa5b072ae77fd2674ccca699f8ecb01e97713e1eb56749af`,
   `SOURCE.txt`, MIT `LICENSE`), from latent-spaces/brag `669ab9286aa28b6c3ee30e75f181ee74319d012a` via codeload. Invoked with
@@ -61,8 +69,13 @@ Writer: Opus 5.5 high fast (user). Outside check: none. Tell the hub before any 
 - Sources in `geo/promo/brag/` (plan, scene, soundtrack, renderer, share copy, README). Timeline 100 BPM, 42 bars = 100.8 s.
 - Preview (stills + transitions): `~/data/geoaidesk/work/gaid-promo-video-v4-brag/prev1/` — scenes and dips on bar lines checked by eye.
 - Soundtrack check (prev1 cues): all detected onsets on the 16th grid; peak −1.9 dBFS, RMS −16.8 dBFS; sections −14 to −21 dBFS.
+- v4_brag final: job 1 done (exit 0): 100.8 s, 3,024 frames, H.264 + AAC stereo 48 kHz; decoded audio = synthesised WAV
+  (4,838,400 samples, offset 0). Video sha256 5b99a82c2327de1c921e3582fa8c57eb106fb28e43702ecff3382f1fd784250a.
+- promo40 (user: Yilgarn + PGI examples, screens as windows inside motion graphics): sources `geo/promo/brag/promo40/`,
+  previews `~/data/geoaidesk/work/gaid-promo-video-v4-brag/p40-prev1..4` (fixed: inactive layers leaked through
+  `visibility`; now `display`), soundtrack onsets on the 120 BPM sixteenth grid, peak −1.75 dBFS, RMS −15.5 dBFS.
 ## Next steps
-1. Final render job, then report `reports/2026-10-24-gaid-promo-video-v4-brag/index.md`, registry entry `review`.
+1. promo40 render job, then report `reports/2026-10-24-gaid-promo-video-v4-brag/index.md`, registry entry `review`.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: one tightly coupled package (scene timing ↔ soundtrack cues ↔ renderer); done by the writer, no children.

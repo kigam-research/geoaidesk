@@ -1,8 +1,12 @@
-"""Render GAID promo v4_brag (100.8 s, 1920x1080, 30 fps, stereo soundtrack) — the brag-slim deliverables.
+"""Render a GAID brag film (1920x1080, 30 fps, stereo soundtrack) — the brag-slim deliverables.
 
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
   --with numpy==2.5.4 --with scipy==1.18.1 \
-  python geo/promo/brag/render.py --capture <capture-v3> --out <new dir> [--stills-only] [--times 1,2] [--transitions]
+  python geo/promo/brag/render.py [--film v4_brag|promo40] --capture <capture-v3> [--capture2 <capture-v2>] \
+  --out <new dir> [--stills-only] [--times 1,2] [--transitions]
+
+Films: v4_brag (100.8 s, the v4 scenes re-cut; this folder) and promo40 (40 s, made fresh; promo40/, also needs the v2
+Yilgarn capture as --capture2).
 
 Same page mechanics as geo/promo/render.py (v4): the brag scene (geo/promo/brag/scene.js) draws film second t
 deterministically; each frame is a Chrome screenshot piped to H.264. The soundtrack is synthesised from the page's cues
@@ -26,8 +30,24 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PROMO = HERE.parent
 REPO = PROMO.parents[1]
+
+def load(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 sys.path.insert(0, str(HERE))
-import soundtrack  # noqa: E402
+import soundtrack  # noqa: E402  (v4_brag's soundtrack; promo40 imports its instruments)
+
+FILMS = {
+    "v4_brag": {"dir": HERE, "css": PROMO / "scene" / "scene.css", "sound": HERE / "soundtrack.py",
+                "options": "--tone polished --format landscape --duration 100.8"},
+    "promo40": {"dir": HERE / "promo40", "css": HERE / "promo40" / "scene.css", "sound": HERE / "promo40" / "soundtrack.py",
+                "options": "--tone default (freer promotional direction) --format landscape --duration 40"},
+}
 
 _spec = importlib.util.spec_from_file_location("promo_render_v4", PROMO / "render.py")  # the v4 renderer's helpers
 _v4 = importlib.util.module_from_spec(_spec)
@@ -36,22 +56,27 @@ FPS, WIDTH, HEIGHT = _v4.FPS, _v4.WIDTH, _v4.HEIGHT
 contact_sheet, digest, serve, validate_capture = _v4.contact_sheet, _v4.digest, _v4.serve, _v4.validate_capture
 
 
-def prepare(root: Path, capture: Path | None) -> dict | None:
+def prepare(root: Path, film: dict, capture: Path | None, capture2: Path | None = None) -> dict | None:
     root.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(HERE / "scene.js", root / "scene.js")
-    shutil.copy2(PROMO / "scene" / "scene.css", root / "scene.css")
+    shutil.copy2(film["dir"] / "scene.js", root / "scene.js")
+    shutil.copy2(film["css"], root / "scene.css")
     shutil.copytree(PROMO / "scene" / "icons", root / "icons", dirs_exist_ok=True)
     (root / "fonts").mkdir(exist_ok=True)
     shutil.copy2(REPO / "web/public/fonts/PretendardVariable.woff2", root / "fonts")
     shutil.copy2(REPO / "web/public/fonts/PRETENDARD-LICENSE.txt", root / "fonts")
     (root / "brand").mkdir(exist_ok=True)
-    shutil.copy2(REPO / "geo/brand/logo/horizontal-color.svg", root / "brand")
+    for logo in ("horizontal-color.svg", "horizontal-on-dark.svg"):
+        shutil.copy2(REPO / "geo/brand/logo" / logo, root / "brand")
     take = validate_capture(capture) if capture else None
-    link = root / "capture"
-    if link.is_symlink():
-        link.unlink()
-    if capture:
-        link.symlink_to(capture.resolve(), target_is_directory=True)
+    if capture2:
+        validate_capture(capture2)
+    # v4_brag reads capture/, promo40 reads cap3/ (Pocheon PGI, v3) and cap2/ (Yilgarn, v2)
+    for name, target in (("capture", capture), ("cap3", capture), ("cap2", capture2)):
+        link = root / name
+        if link.is_symlink():
+            link.unlink()
+        if target:
+            link.symlink_to(target.resolve(), target_is_directory=True)
     html = (PROMO / "scene/index.html").read_text()
     html = html.replace("@@DATA@@", "{}").replace("@@CAPTURE@@", json.dumps(take, ensure_ascii=False))
     (root / "index.html").write_text(html)
@@ -85,7 +110,9 @@ def sync_check(ffmpeg: str, video: Path, wav: Path) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--film", choices=sorted(FILMS), default="v4_brag")
     parser.add_argument("--capture", type=Path)
+    parser.add_argument("--capture2", type=Path, help="v2 Yilgarn capture (promo40)")
     parser.add_argument("--out", type=Path, default=Path(os.environ.get("TASK_OUTPUT_DIR", "")) or None)
     parser.add_argument("--stills-only", action="store_true")
     parser.add_argument("--times", help="comma-separated preview times instead of the standard stills")
@@ -94,14 +121,16 @@ def main():
     args = parser.parse_args()
     if not args.out:
         parser.error("--out (or TASK_OUTPUT_DIR) is required")
-    if not args.stills_only and not args.capture:
-        parser.error("The film needs the real capture; no placeholder footage")
+    if not args.capture or (args.film == "promo40" and not args.capture2):
+        parser.error("The film needs the real captures; no placeholder footage")
+    film = FILMS[args.film]
+    sound_mod = soundtrack if args.film == "v4_brag" else load("promo40_soundtrack", film["sound"])
     out = args.out.resolve()
     work = out / "work"
     video = out / "brag.mp4"
     if video.exists():
         raise FileExistsError("Use a new output directory")
-    take = prepare(work / "web", args.capture.resolve() if args.capture else None)
+    take = prepare(work / "web", film, args.capture.resolve(), args.capture2.resolve() if args.capture2 else None)
 
     import imageio_ffmpeg
     from PIL import Image
@@ -129,7 +158,7 @@ def main():
                                " transitions: window.motion.transitions, segments: window.motion.segments})")
         seconds_total = motion["duration"]
         frames_total = round(seconds_total * FPS)
-        if abs(seconds_total - soundtrack.DURATION) > 1e-6 or motion["grid"]["bpm"] != soundtrack.BPM:
+        if abs(seconds_total - sound_mod.DURATION) > 1e-6 or motion["grid"]["bpm"] != sound_mod.BPM:
             raise ValueError("Scene and soundtrack disagree on the grid")
         (work / "cues.json").write_text(json.dumps(motion["cues"], indent=1) + "\n")
         times = dict(motion["stills"]) if not args.times else {f"t{float(t):06.2f}": float(t) for t in args.times.split(",")}
@@ -150,7 +179,7 @@ def main():
             im.convert("RGB").save(out / "brag.jpg", quality=92)
         sound = None
         if not args.stills_only:
-            sound = soundtrack.render(motion["cues"], work / "sound", work / "sound" / "stems")
+            sound = sound_mod.render(motion["cues"], work / "sound", work / "sound" / "stems")
             wav = work / "sound" / "soundtrack.wav"
             cmd = [
                 ffmpeg, "-y", "-loglevel", "error",
@@ -185,23 +214,27 @@ def main():
     sheet = contact_sheet(stills, out)
     shutil.move(str(sheet), work / "contact-sheet.jpg")
     for name in ("brag-plan.md", "share-copy.txt"):
-        shutil.copy2(HERE / name, out / name)
+        shutil.copy2(film["dir"] / name, out / name)
     sync = None
     if not args.stills_only:
         sync = sync_check(ffmpeg, video, work / "sound" / "soundtrack.wav")
         if abs(sync["offset_samples"]) > 48 or abs(sync["decoded_samples"] - sync["reference_samples"]) > 2048:
             raise ValueError(f"Audio out of sync: {sync}")
     manifest = {
-        "schema": "gaid-promo-video-v4-brag",
+        "schema": f"gaid-promo-video-{args.film.replace('_', '-')}",
+        "film": args.film,
         "created_utc": datetime.now(UTC).isoformat(),
         "source_sha": os.environ.get("TASK_SOURCE_SHA", "unrecorded-preview"),
         "brag": {"skill": "brag-slim", "repo": "https://github.com/latent-spaces/brag",
                  "commit": "669ab9286aa28b6c3ee30e75f181ee74319d012a", "license": "MIT",
-                 "options": "--tone polished --format landscape --duration 100.8"},
+                 "options": film["options"]},
         "width": WIDTH, "height": HEIGHT, "fps": FPS, "seconds": seconds_total,
         "frames": 0 if args.stills_only else frames_total, "grid": motion["grid"], "poster_time": motion["poster"],
         "capture": None if not take else {
             "path": str(args.capture / "capture.json"), "sha256": digest(args.capture / "capture.json"),
+        },
+        "capture2": None if not args.capture2 else {
+            "path": str(args.capture2 / "capture.json"), "sha256": digest(args.capture2 / "capture.json"),
         },
         "audio": None if not sound else {
             "codec": "aac", "bitrate": "256k", "sample_rate": 48000, "channels": 2,

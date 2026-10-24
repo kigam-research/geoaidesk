@@ -93,8 +93,8 @@ def tone_at(t: float, octave: int, step: int = 0) -> float:
 
 # ---------- buffers ----------
 class Bus:
-    def __init__(self):
-        self.x = np.zeros((2, N + SR * 4))
+    def __init__(self, n: int | None = None):
+        self.x = np.zeros((2, (n or N) + SR * 4))
 
     def add(self, start: float, mono: np.ndarray, gain: float = 1.0, pan: float = 0.0):
         i = round(start * SR)

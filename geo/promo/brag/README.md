@@ -13,6 +13,11 @@ user decisions 2026-10-24). Internal review only.
 | `render.py` | Renders `brag.mp4` (frame 0 = poster), `brag.jpg`, `manifest.json`; copies `brag-plan.md` and `share-copy.txt` |
 | `share-copy.txt` | brag's share copy |
 
+`promo40/` holds the second film (user request 2026-10-24): 40 s, made fresh in code with brag-slim, same messages,
+freer promotional direction, real GAID screens only as window crops (v3 Pocheon PGI and v2 Yilgarn takes):
+`brag-plan.md`, `scene.js`, `scene.css`, `soundtrack.py` (120 BPM, the instruments of `soundtrack.py`), `share-copy.txt`.
+Render with `render.py --film promo40 --capture <capture-v3> --capture2 <capture-v2>`.
+
 `render.py` reuses `geo/promo/scene/{index.html,scene.css,icons}` and the v4 renderer's helpers.
 
 ```sh
