@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T02:51:45Z
+status: done
+updated: 2026-10-24T02:52:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8903c027-bae6-4d62-be5f-363a50e7cd24","pid":1209415,"provider":"claude","session":"75265567-6398-46a1-800a-916e466ecb73","start":"69452397","token":"e8629b2b35ed6c90a1d8703ce6bad2bc0e6d8d0733cee71031a1026cfc73221f"}
 branch: task/gaid-ui-quality-kit
 target: main
@@ -71,7 +71,8 @@ Details (2026-10-24):
 Re-verify: `cd geo/ui/quality && npm ci && cd ../../.. && node geo/ui/quality/run.mjs --out /tmp/x` (report-only, ~1 min).
 
 ## Next steps
-1. task review-copy of the report, task save, task finish (finish reruns scripts/check).
+<!-- task:closed -->
+Closed 2026-10-24T02:52:10Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-ui-quality-kit.md.
 
 ## Failed approaches
 - First full scripts/check (check-1.log, 2026-10-24): backend sandbox-upload.test.ts failed 8 tests with "Cannot find
@@ -106,7 +107,7 @@ Orchestration (2026-10-24):
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-- [결정] 첫 점검이 찾은 공용 부품 문제(대비 미달 다섯 곳, 초점 고리 모양)를 어떻게 할까요? — 가) 다음 화면 작업(A) 전에 작은 수정 작업 하나로 고친다 — 나) 점검 결과로만 두고 해당 화면을 다룰 때 고친다 — 권장: 가) 모든 화면에 쓰이는 부품이라 효과가 넓고 막는 단계 전환이 쉬워진다 — 막힌 일: 점검 도구의 막는 단계 전환 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-quality-kit/index.md#6-결정할-일
+- [결정 gaid-ui-quality-kit#1] 첫 점검이 찾은 공용 부품 문제(대비 미달 다섯 곳, 초점 고리 모양)를 어떻게 할까요? — 가) 다음 화면 작업(A) 전에 작은 수정 작업 하나로 고친다 — 나) 점검 결과로만 두고 해당 화면을 다룰 때 고친다 — 권장: 가) 모든 화면에 쓰이는 부품이라 효과가 넓고 막는 단계 전환이 쉬워진다 — 막힌 일: 점검 도구의 막는 단계 전환 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-quality-kit/index.md#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
