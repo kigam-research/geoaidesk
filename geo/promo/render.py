@@ -1,11 +1,12 @@
-"""Render the GAID promo film (v4, ~103 s, 1920x1080, 30 fps, silent) from the scene and the capture.
+"""Render the GAID promo film (v5, ~100 s, 1920x1080, 30 fps, silent) from the scene and the captures.
 
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
-  python geo/promo/render.py [--capture <capture-v3>] --out <new dir> [--stills-only] [--times 1,2]
+  python geo/promo/render.py --capture v3=<capture-v3> [--capture v5=<capture-v5>] --out <new dir> [--stills-only] [--times 1,2]
 
 The page draws film second t deterministically (window.motion.frame); each frame is a Chrome screenshot piped to
-H.264 (imageio-ffmpeg). The final video refuses to render without the real capture (no placeholder footage). The film
-length and the standard stills come from the page (window.motion.duration / .stills): the demo lasts as long as the takes.
+H.264 (imageio-ffmpeg). The captures are merged into one shot list (patterns prefixed with their name); the final video
+refuses to render without both real captures (no placeholder footage). The film length and the standard stills come
+from the page (window.motion.duration / .stills): the demo lasts as long as the takes.
 """
 
 from __future__ import annotations
@@ -66,7 +67,26 @@ def validate_capture(root: Path) -> dict:
     return take
 
 
-def prepare(root: Path, data: Path | None, capture: Path | None) -> tuple[dict, dict | None]:
+REQUIRED = ("v3", "v5")
+
+
+def merge(captures: dict[str, Path]) -> dict | None:
+    merged = None
+    for name, root in captures.items():
+        take = validate_capture(root)
+        if merged is None:
+            merged = {k: v for k, v in take.items() if k not in ("shots", "stills")} | {"shots": []}
+        if take["css"] != merged["css"]:
+            raise ValueError(f"{name}: different CSS viewport")
+        ids = {s["id"] for s in merged["shots"]}
+        for shot in take["shots"]:
+            if shot["id"] in ids:
+                raise ValueError(f"{name}: duplicate shot {shot['id']}")
+            merged["shots"].append(shot | {"pattern": f"{name}/{shot['pattern']}", "capture": name})
+    return merged
+
+
+def prepare(root: Path, data: Path | None, captures: dict[str, Path]) -> tuple[dict, dict | None]:
     root.mkdir(parents=True, exist_ok=True)
     for name in ("scene.js", "scene.css", "icons"):
         src = HERE / "scene" / name
@@ -80,11 +100,13 @@ def prepare(root: Path, data: Path | None, capture: Path | None) -> tuple[dict, 
     (root / "brand").mkdir(exist_ok=True)
     shutil.copy2(REPO / "geo/brand/logo/horizontal-color.svg", root / "brand")
     world = json.loads(data.read_text()) if data else {}
-    take = validate_capture(capture) if capture else None
-    link = root / "capture"
-    if link.is_symlink():
-        link.unlink()
-    if capture:
+    take = merge(captures)
+    links = root / "capture"
+    links.mkdir(exist_ok=True)
+    for name, capture in captures.items():
+        link = links / name
+        if link.is_symlink():
+            link.unlink()
         link.symlink_to(capture.resolve(), target_is_directory=True)
     html = (HERE / "scene/index.html").read_text()
     html = html.replace("@@DATA@@", json.dumps(world, ensure_ascii=False))
@@ -113,7 +135,7 @@ def contact_sheet(stills: dict, out: Path) -> Path:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, help="unused by the v2/v3 scenes; kept for v1 reproduction")
-    parser.add_argument("--capture", type=Path)
+    parser.add_argument("--capture", action="append", default=[], metavar="NAME=DIR")
     parser.add_argument("--out", type=Path, default=Path(os.environ.get("TASK_OUTPUT_DIR", "")) or None)
     parser.add_argument("--stills-only", action="store_true")
     parser.add_argument("--times", help="comma-separated preview times instead of the standard stills")
@@ -121,13 +143,19 @@ def main():
     args = parser.parse_args()
     if not args.out:
         parser.error("--out (or TASK_OUTPUT_DIR) is required")
-    if not args.stills_only and not args.capture:
-        parser.error("The film needs the real capture; no placeholder footage")
+    captures = {}
+    for spec in args.capture:
+        name, _, path = spec.partition("=")
+        if name not in REQUIRED or not path:
+            parser.error(f"--capture takes NAME=DIR with NAME in {REQUIRED}")
+        captures[name] = Path(path).expanduser().resolve()
+    if not args.stills_only and set(captures) != set(REQUIRED):
+        parser.error("The film needs both real captures (v3, v5); no placeholder footage")
     out = args.out.resolve()
-    video = out / "gaid-promo-v4.mp4"
+    video = out / "gaid-promo-v5.mp4"
     if video.exists():
         raise FileExistsError("Use a new output directory")
-    world, take = prepare(out / "web", args.data.resolve() if args.data else None, args.capture.resolve() if args.capture else None)
+    world, take = prepare(out / "web", args.data.resolve() if args.data else None, captures)
 
     import imageio_ffmpeg
     from playwright.sync_api import sync_playwright
@@ -191,14 +219,15 @@ def main():
         raise RuntimeError("Browser errors: " + "; ".join(errors))
     sheet = contact_sheet(stills, out)
     manifest = {
-        "schema": "gaid-promo-video-v4",
+        "schema": "gaid-promo-video-v5",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_sha": os.environ.get("TASK_SOURCE_SHA", "unrecorded-preview"),
         "width": WIDTH, "height": HEIGHT, "fps": FPS, "seconds": seconds_total,
         "frames": 0 if args.stills_only else frames_total, "audio": False,
         "data": None if not args.data else {"path": str(args.data), "sha256": digest(args.data)},
-        "capture": None if not take else {
-            "path": str(args.capture / "capture.json"), "sha256": digest(args.capture / "capture.json"),
+        "captures": {
+            name: {"path": str(root / "capture.json"), "sha256": digest(root / "capture.json")}
+            for name, root in captures.items()
         },
         "stills": stills,
         "contact_sheet": str(sheet.relative_to(out)),
