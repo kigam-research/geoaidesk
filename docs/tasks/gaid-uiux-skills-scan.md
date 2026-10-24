@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:43:23Z
+updated: 2026-10-24T01:49:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb0553e3-6706-4fe7-9730-9f75d9d39cfe","pid":966419,"provider":"claude","session":"b1289fe9-42f0-4682-94c0-925757dafec6","start":"69281518","token":"d321e558c9b0c58fc48c8ab736e7a1ad45eb33b0aeeb082af9f6a5b9f0f947a1"}
 branch: task/gaid-uiux-skills-scan
 target: main
@@ -45,8 +45,8 @@ Request from the starter:
 - Outside check: none.
 
 ## Current state
-- Result: report `reports/2026-10-24-gaid-uiux-skills-scan/index.md` (Korean, humanizer pass done) with 6 figures; waiting for
-  the user's choice of scenarios (decision 1) and whether to refresh the design-skill copies (decision 2).
+- Result: report `reports/2026-10-24-gaid-uiux-skills-scan/index.md` (Korean, humanizer pass done) with 6 figures. User chose
+  all recommendations (2026-10-24); follow-up units sent to the hub as goal request b24f0516e365. Mockup server stopped.
 - Research (2026-10-24): verified directly with `gh api`: impeccable skill-v4.7.0 (2026-10-19; our copy 4.3.1), taste-skill
   v2.1.4 (2026-10-20; our copy is the v1 landing-only text), shadcn CLI 4.22.1, AI Elements/Trace/Code Block (PR #12307),
   shadcn skill design-system page (PR #12252), `shadcn-ui/lint` (MIT, created 2026-09-02, pushed 2026-10-19). From Oracle only
@@ -64,14 +64,16 @@ Request from the starter:
   `cap.sh <scene>` (playwright-cli session `uiux`), montage `montage.py`. Shots + `shots.sha256`, source archive
   `mockups-src.tgz` (sha256 809c4112…31ac). `web/node_modules` installed with `npm ci` (ignored by Git).
 ## Next steps
-1. Take the user's answers to the two decisions in this conversation; record them under Notes and decisions verbatim.
-2. Send the chosen implementation units to the hub as a goal (`task hub --send --kind goal --confirmed`), not started here.
-3. Stop `gaid-uiux-mock` (`systemctl --user stop gaid-uiux-mock`) and close playwright session `uiux`; then `task finish`.
+1. Done: mockup server stopped, playwright session closed; `task finish`.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: single writer does research synthesis, mockups and report itself (design judgement is tightly coupled;
   no child writers). Oracle is a research source only. No app code changes in this unit; mockup code stays in
   `~/data/geoaidesk/work/gaid-uiux-skills-scan/`. Only the report folder and this task document are tracked.
+- User decision (verbatim, 2026-10-24): "모두 권장으로 진행하자." → decision 1 가) implement D (quality kit: states page, shadcn
+  lint, impeccable detect, Playwright 4-combo screenshots, axe) first, then A (hub stage plate) and C (서재 status consolidation);
+  B (chat analysis plan) only after a separate run-signal design discussion. Decision 2 가) refresh the read-only design-skill
+  copies to impeccable 4.7.0 and taste-skill 2.1.4, telemetry off, no install. Forwarded to the hub as a goal; not started here.
 - Lesson applied (user, gaid-visual-benchmark): no generated imagery. Mockups are code-built from the real tokens and
   components so the design system is the authority, not an approximation. impeccable 4.5.2 notes independently that code
   builds of app screens rated well above generated images.
@@ -79,8 +81,7 @@ Request from the starter:
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-- [결정] 어떤 UI/UX 시나리오를 구현 작업으로 진행할까요? — 가) D 점검 체계 먼저, 이어서 A 허브 단계 도식과 C 서재 정리, B는 실행 신호 설계부터 따로 — 나) A·B·C·D 모두 순서대로 — 다) 고른 시나리오만 — 권장: 가) D가 이후 화면 변경을 네 조합에서 자동으로 잡고, A·C는 서버 변경이 거의 없음 — 막힌 일: 구현 작업 시작 — 근거: reports/2026-10-24-gaid-uiux-skills-scan#6-결정할-일
-- [결정] 디자인 스킬 사본(impeccable 4.3.1, taste 1판)을 최신(4.7.0, 2.1.4)으로 바꿀까요? — 가) 읽기용 사본만 갱신, 원격 통계 끔, 설치 없음 — 나) 그대로 둠 — 권장: 가) 두 판 모두 앱 화면을 코드로 만들고 실제 화면을 검사하는 쪽으로 바뀜 — 막힌 일: 다음 UI 작업의 기준 스킬 — 근거: reports/2026-10-24-gaid-uiux-skills-scan#31-조사-결과
+None. Both decisions were answered in this conversation (Notes and decisions).
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
