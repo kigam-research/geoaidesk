@@ -6,7 +6,8 @@
  * of the selected folder (subfolders included). Right: library status and recent papers, the selected folder's 인용 관리,
  * or the selected paper's detail ("내 연구에서 쓰인 곳", folders, read coverage, next actions).
  * gaid-note-library: a 논문 / 정리 노트 switch above the table; research notes have their own table and detail
- * (web/src/geo/library/note-items.tsx).
+ * (web/src/geo/library/note-items.tsx). gaid-library-prep adds 문헌 정리 as a third category (digest-items.tsx,
+ * digest-make-sheet.tsx).
  * gaid-library-pdf-panel: "PDF 열기" shows the paper's PDF in a pane beside the list (list 38 : PDF 62, guide L6) instead of a
  * new browser tab; the list keeps only the paper column, another row with a PDF switches the PDF, close returns to the detail.
  */
@@ -23,6 +24,8 @@ import type { LibraryCollection, LibraryItemKind, LibraryItemResponse, LibraryIt
 import { attachToProject, createFolder, exportUrl, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, renameFolder, sendItemToZotero, setFolderItems, startWorkflowFromItem, zoteroSelectUrl, zoteroState } from "./api";
 import { requestOpenResearchNote } from "@/geo/notes/open-note";
 import { AddNotesDialog, NoteItemDetail, NoteTable } from "./note-items";
+import { DigestItemDetail, DigestTable } from "./digest-items";
+import { DigestMakeSheet } from "./digest-make-sheet";
 import { ItemFolders } from "./item-folders";
 import { AddPaperDialog } from "./add-paper-dialog";
 import { ZoteroCard } from "./zotero-card";
@@ -85,6 +88,7 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
   }, [onOpenProject]);
   const [category, setCategory] = useState<LibraryItemKind>("paper");
   const [addingNotes, setAddingNotes] = useState(false);
+  const [making, setMaking] = useState<{ folderId: string | null } | null>(null);
   const [orcid, setOrcid] = useState<OrcidStatus | null>(null);
   const [orcidError, setOrcidError] = useState(false);
   const [orcidOpen, setOrcidOpen] = useState(false);
@@ -172,7 +176,8 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
   };
   const refreshAfterOrcid = () => { void loadOrcid(); void load(); };
   const notes = category === "note";
-  const chips: { id: Filter; label: string }[] = !counts ? [] : notes
+  const digests = category === "digest";
+  const chips: { id: Filter; label: string }[] = !counts || digests ? [] : notes
     ? [
         { id: "all", label: L("filter.all", { n: counts.notes }) },
         { id: "pending", label: L("notes.filter.pending", { n: counts.notesPending }) },
@@ -185,20 +190,22 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
         { id: "unread", label: L("filter.unread", { n: counts.unread }) },
         { id: "cited", label: L("filter.cited", { n: counts.cited }) },
       ]
-  if (counts && !notes && (counts.mine > 0 || orcid?.profile || filter === "mine")) chips.splice(1, 0, { id: "mine", label: L("filter.mine", { n: counts.mine }) });
+  if (counts && !notes && !digests && (counts.mine > 0 || orcid?.profile || filter === "mine")) chips.splice(1, 0, { id: "mine", label: L("filter.mine", { n: counts.mine }) });
 
   return (
     <CitationPdfContext.Provider value={citationOpener}>
     <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-4 py-6 sm:px-6">
-      <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : counts?.all) ?? 0} allLabel={notes ? L("notes.allFolder") : undefined} selected={folderId}
+      <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : digests ? counts?.digests : counts?.all) ?? 0} allLabel={notes ? L("notes.allFolder") : digests ? t("digest.allFolder") : undefined} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className={cn("flex min-w-0 flex-col gap-3", paneOpen ? "flex-[38]" : "flex-1")} aria-label={L("screen.title")}>
         {/* Title first, top-leading, at the 내 연구 page-title size; the hub sync state is the one context line under it (L4, T1, W6). */}
         <div className="flex items-center justify-between gap-3">
           <h1 className="min-w-0 truncate text-2xl font-bold" title={folder ? folderPath(collections, folder.id) : undefined}>{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">
-            {!notes && !paneOpen && <span className="text-xs text-muted-foreground">{zoteroLine}</span>}
-            {notes ? (
+            {!notes && !digests && !paneOpen && <span className="text-xs text-muted-foreground">{zoteroLine}</span>}
+            {digests ? (
+              <Button onClick={() => setMaking({ folderId })}><NotebookTextIcon data-icon="inline-start" />{t("digest.make.button")}</Button>
+            ) : notes ? (
               <Button onClick={() => setAddingNotes(true)}><NotebookTextIcon data-icon="inline-start" />{L("notes.add.button")}</Button>
             ) : (<>
             <Popover>
@@ -215,17 +222,17 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
         </div>
         <LibrarySyncLine onSynced={load} refreshKey={data} />
         <div className="gaid-seg flex w-fit items-center gap-0.5 rounded-lg border border-gaid-edge bg-gaid-hover p-0.5" role="group" aria-label={L("category.label")}>
-          {(["paper", "note"] as const).map((k) => (
+          {(["paper", "note", "digest"] as const).map((k) => (
             <button key={k} type="button" aria-pressed={category === k}
               onClick={() => { if (category !== k) { setCategory(k); setFilter("all"); setSelected(null); } }}
               className={cn("rounded-md px-3 py-1 text-sm font-medium", category === k ? "bg-gaid-face text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-              {L(`category.${k}`, { n: (k === "note" ? counts?.notes : counts?.all) ?? 0 })}
+              {k === "digest" ? t("digest.categoryCount", { n: counts?.digests ?? 0 }) : L(`category.${k}`, { n: (k === "note" ? counts?.notes : counts?.all) ?? 0 })}
             </button>
           ))}
         </div>
         <label className="flex h-11 items-center gap-2 rounded-lg border bg-background px-3 focus-within:ring-2 focus-within:ring-ring">
           <SearchIcon className="size-4 text-muted-foreground" aria-hidden />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={folder ? L("screen.searchFolder", { name: folder.name }) : notes ? L("notes.search") : L("screen.search")} aria-label={folder ? L("screen.searchFolder", { name: folder.name }) : notes ? L("notes.search") : L("screen.search")} className="h-full flex-1 bg-transparent text-[15px] outline-none" />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={folder ? L("screen.searchFolder", { name: folder.name }) : notes ? L("notes.search") : digests ? t("digest.search") : L("screen.search")} aria-label={folder ? L("screen.searchFolder", { name: folder.name }) : notes ? L("notes.search") : digests ? t("digest.search") : L("screen.search")} className="h-full flex-1 bg-transparent text-[15px] outline-none" />
         </label>
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-1.5" role="group" aria-label={L("filter.label")}>
@@ -241,6 +248,17 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
           <p className="py-8 text-sm text-muted-foreground">{L("screen.loading")}</p>
         ) : folder && data.total === 0 && !query.trim() && filter === "all" ? (
           <p className="py-8 text-sm text-muted-foreground">{L("folders.emptyFolder")}</p>
+        ) : digests && data.counts.digests === 0 ? (
+          <div className="flex flex-col items-start gap-3 py-8">
+            <p className="text-sm text-muted-foreground">{t("digest.empty")}</p>
+            <Button variant="outline" onClick={() => setMaking({ folderId })}><NotebookTextIcon data-icon="inline-start" />{t("digest.make.button")}</Button>
+          </div>
+        ) : digests ? (
+          <>
+            <p className="text-xs text-muted-foreground">{t("digest.state", { shown: data.total, total: folder ? data.folderCounts[folder.id] ?? 0 : data.counts.digests })}</p>
+            <div className="min-h-0 flex-1 overflow-auto"><DigestTable rows={data.items} selected={selected} onSelect={setSelected} compact={paneOpen} /></div>
+            <p className="max-w-[680px] text-xs text-muted-foreground">{t("digest.note")}</p>
+          </>
         ) : notes && data.counts.notes === 0 ? (
           <div className="flex flex-col items-start gap-3 py-8">
             <p className="text-sm text-muted-foreground">{L("notes.empty")}</p>
@@ -308,19 +326,20 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
       {/* Hidden, not unmounted, while the PDF is open: closing it returns to the same detail without reloading (L9). */}
       <aside className={cn("w-[340px] shrink-0 flex-col gap-3", paneOpen ? "hidden" : "flex")}>
         {selected ? (
-          <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} focusPdf={refocusPdf === selected} onPdfFocused={() => setRefocusPdf(null)} onOpenPdf={(title) => setPdf({ id: selected, title })} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onOpenNote={openNote} onSelect={setSelected} onChanged={load} />
+          <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} focusPdf={refocusPdf === selected} onPdfFocused={() => setRefocusPdf(null)} onOpenPdf={(title) => setPdf({ id: selected, title })} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onOpenNote={openNote} onSelect={setSelected} onChanged={load} onRemake={(id) => setMaking({ folderId: id })} />
         ) : folder ? (
           <FolderPanel folder={folder} collections={collections} count={data?.folderCounts[folder.id] ?? 0} zoteroConnected={zoteroConnected}
             onSelectItem={setSelected} onCreateSub={() => setNaming({ mode: "create", parentId: folder.id })} onRename={() => setNaming({ mode: "rename" })}
             onDeleted={() => { setFolderId(null); void load(); }} onChanged={load} />
         ) : (
           <>
-            {!notes && <OrcidCard status={orcid} loadError={orcidError} onStatus={setOrcid} onChanged={refreshAfterOrcid} onRetry={() => void loadOrcid()} onImport={() => { setOrcidStarted(true); setOrcidOpen(true); }} />}
-            <SidePanel data={data} notes={notes} onSelect={setSelected} onChanged={load} />
+            {!notes && !digests && <OrcidCard status={orcid} loadError={orcidError} onStatus={setOrcid} onChanged={refreshAfterOrcid} onRetry={() => void loadOrcid()} onImport={() => { setOrcidStarted(true); setOrcidOpen(true); }} />}
+            <SidePanel data={data} notes={notes || digests} digests={digests} onSelect={setSelected} onChanged={load} />
           </>
         )}
       </aside>
       {orcidStarted && orcid?.profile && <OrcidImportDialog profile={orcid.profile} key={orcid.profile.orcid} open={orcidOpen} onOpenChange={setOrcidOpen} collections={collections} onImported={refreshAfterOrcid} />}
+      <DigestMakeSheet open={making !== null} onOpenChange={(open) => { if (!open) setMaking(null); }} collections={collections} folderId={making?.folderId ?? null} onOpenProject={onOpenProject} />
       <AddNotesDialog open={addingNotes} onOpenChange={setAddingNotes} folder={folder} onAdded={(firstId) => { void load(); if (firstId) setSelected(firstId); }} />
       <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => {
         if (item && folderId) void addToFolder(folderId, item.id); else void load();
@@ -334,7 +353,7 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
   );
 }
 
-function SidePanel({ data, notes, onSelect, onChanged }: { data: LibraryListResponse | null; notes: boolean; onSelect: (id: string) => void; onChanged: () => void }) {
+function SidePanel({ data, notes, digests = false, onSelect, onChanged }: { data: LibraryListResponse | null; notes: boolean; digests?: boolean; onSelect: (id: string) => void; onChanged: () => void }) {
   if (!data) return null;
   const byAdded = [...data.items].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
   return (
@@ -343,13 +362,14 @@ function SidePanel({ data, notes, onSelect, onChanged }: { data: LibraryListResp
         <h2 className="text-base font-semibold">{L("side.statusTitle")}</h2>
         <p className="text-sm">{L("side.papers", { n: data.counts.all })}</p>
         {data.counts.notes > 0 && <p className="text-sm">{L("notes.side", { n: data.counts.notes })}</p>}
+        {data.counts.digests > 0 && <p className="text-sm">{t("digest.side", { n: data.counts.digests })}</p>}
         {data.counts.unread > 0 && <p className="text-sm text-muted-foreground">{L("side.unread", { n: data.counts.unread })}</p>}
       </div>
       {/* Research notes never go to Zotero; its card belongs to the papers. */}
       {!notes && <ZoteroCard libraries={data.zotero} papers={data.counts.zotero} onChanged={onChanged} />}
       {byAdded.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl border p-4">
-          <h2 className="text-base font-semibold">{L(notes ? "notes.recentTitle" : "side.recentTitle")}</h2>
+          <h2 className="text-base font-semibold">{digests ? t("digest.recentTitle") : L(notes ? "notes.recentTitle" : "side.recentTitle")}</h2>
           {byAdded.slice(0, 4).map((row) => (
             <button key={row.id} type="button" onClick={() => onSelect(row.id)} className="-mx-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <span className="line-clamp-2 font-medium">{row.title}</span>
@@ -367,7 +387,7 @@ function useLabel(use: LibraryUse): string {
   return L("detail.useProject", { name: use.projectName });
 }
 
-function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, onOpenPdf, onClose, onOpenProject, onOpenNote, onSelect, onChanged }: { id: string; collections: LibraryCollection[]; zoteroConnected: boolean; focusPdf: boolean; onPdfFocused: () => void; onOpenPdf: (title: string) => void; onClose: () => void; onOpenProject: (projectId: string) => void; onOpenNote: (projectId: string, noteId: string) => void; onSelect: (id: string) => void; onChanged: () => void }) {
+function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, onOpenPdf, onClose, onOpenProject, onOpenNote, onSelect, onChanged, onRemake }: { id: string; collections: LibraryCollection[]; zoteroConnected: boolean; focusPdf: boolean; onPdfFocused: () => void; onOpenPdf: (title: string) => void; onClose: () => void; onOpenProject: (projectId: string) => void; onOpenNote: (projectId: string, noteId: string) => void; onSelect: (id: string) => void; onChanged: () => void; onRemake: (folderId: string) => void }) {
   const [data, setData] = useState<LibraryItemResponse | null>(null);
   const [sendNote, setSendNote] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
@@ -388,6 +408,8 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
   if (!data) return <div className="rounded-xl border p-4 text-sm text-muted-foreground">{L("screen.loading")}</div>;
   if (data.item.kind === "note" && data.item.note)
     return <NoteItemDetail data={data} collections={collections} onClose={onClose} onOpenNote={onOpenNote} onSelect={onSelect} onChanged={onChanged} onReload={async () => setData(await getLibraryItem(id))} />;
+  if (data.item.kind === "digest" && data.item.digest)
+    return <DigestItemDetail data={data} collections={collections} onClose={onClose} onOpenProject={onOpenProject} onSelect={onSelect} onChanged={onChanged} onReload={async () => setData(await getLibraryItem(id))} onRemake={onRemake} />;
   const { item, uses } = data;
   const year = item.csl.issued?.["date-parts"]?.[0]?.[0];
   const authors = (item.csl.author ?? []).map((a) => a.family || a.literal || "").filter(Boolean);

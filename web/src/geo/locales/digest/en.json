@@ -1,1 +1,135 @@
-{}
+{
+  "category": "Literature digest",
+  "categoryCount": "Literature digests {n}",
+  "allFolder": "All literature digests",
+  "search": "Search literature digests",
+  "empty": "No literature digests yet. The AI agent can read a folder's papers and compare or summarize them.",
+  "state": "Literature digests {shown} / {total}",
+  "note": "A literature digest is material prepared from several papers in advance. When a Workflow starts, the AI agent reads it first and checks citations against the original papers' pages.",
+  "noMatch": "No matching literature digest.",
+  "side": "{n} literature digests",
+  "recentTitle": "Recently added digests",
+  "status": {
+    "pending": "Not reviewed",
+    "confirmed": "Checked",
+    "pendingTip": "The researcher has not checked the content yet",
+    "confirmedTip": "The researcher checked the content"
+  },
+  "origin": {
+    "gaid": "Made in GAID",
+    "external": "External summary",
+    "gaidTip": "A literature digest the AI agent made from library papers with a general Workflow",
+    "externalTip": "A summary imported from a file exported from Gemini Notebook. Never used as a citation source"
+  },
+  "workflow": {
+    "compare-papers": "Compare papers",
+    "summarize-paper": "Summarize papers",
+    "methods-comparison": "Compare methods"
+  },
+  "table": {
+    "digest": "Literature digest",
+    "date": "Date",
+    "origin": "Source",
+    "status": "Status",
+    "covers": "{count} papers",
+    "unmatched": "{count} sources not in the library",
+    "newPapers": "{count} papers added since"
+  },
+  "detail": {
+    "madeLine": "General Workflow {workflow} · project {project} · {date}",
+    "importedLine": "{file} · imported {date}",
+    "missing": "The digest file was not found in its project. Showing the copy kept in the library.",
+    "question": "Research question",
+    "externalLimit": "An external summary is read for reference only and never used as a citation source.",
+    "use": {
+      "button": "Use in a Workflow"
+    },
+    "useTitle": "Project to attach the covered papers to",
+    "usedIn": "The Workflow start window in {name} can now read it first",
+    "useFailed": "Could not attach the covered papers to the project. Try again.",
+    "confirm": {
+      "button": "Mark as checked"
+    },
+    "unconfirm": {
+      "button": "Mark as not reviewed"
+    },
+    "statusFailed": "Could not change the status. Try again.",
+    "openProject": {
+      "button": "Open in project"
+    },
+    "remove": {
+      "button": "Remove from library"
+    },
+    "removeConfirm": "Removes the external summary and the imported file record from the library.",
+    "removeConfirmMade": "Removes it from the library. The digest file stays in the project.",
+    "removeYes": {
+      "button": "Remove from library"
+    },
+    "removed": "Removed from the library",
+    "removeFailed": "Could not remove it from the library. Try again.",
+    "stale": "{count} papers were added to the folder {folder} after the digest was made.",
+    "remake": {
+      "button": "Make again"
+    },
+    "coversTitle": "{count} papers covered",
+    "coversNone": "None of its papers are still in the library.",
+    "openPaper": {
+      "action": "View paper"
+    },
+    "unmatched": "{count} sources not in the library were not linked.",
+    "outlineTitle": "Contents",
+    "content": "Read full digest",
+    "truncated": "Only the beginning is kept in the library. The full text is in the original file."
+  },
+  "make": {
+    "button": "Make literature digest",
+    "title": "Make a literature digest",
+    "context": "The AI agent reads the chosen papers, writes a comparison or summary with a citation list, and adds it to the library.",
+    "papers": "Papers to cover",
+    "papersHint": "Choose a library folder. Papers in its subfolders are read too.",
+    "folderNone": "Choose a folder",
+    "papersCount": "{count} papers",
+    "papersCountPdf": "{count} papers · {pdf} PDFs",
+    "noPdf": "For {count} papers without a PDF only the record and abstract are read.",
+    "kind": "Digest type",
+    "kindHint": "Made with one of the general Workflows in GAID.",
+    "recommended": "Recommended",
+    "kinds": {
+      "compare-papers": "Compare papers",
+      "compare-papersHint": "Compares claims, methods, data and limits in one table with page citations.",
+      "summarize-paper": "Summarize papers",
+      "summarize-paperHint": "Summarizes each paper's objective, methods, findings and significance separately. No comparison table.",
+      "methods-comparison": "Compare methods",
+      "methods-comparisonHint": "Compares methods for the research question by strengths, weaknesses and the data they need."
+    },
+    "why": {
+      "compare-papers": "Recommended because two or more papers are chosen.",
+      "summarize-paper": "Recommended because one paper is chosen."
+    },
+    "question": "Research question",
+    "questionHint": "The digest is organised around it. Write one or two sentences.",
+    "questionPlaceholder": "For example: what does a petrophysically constrained inversion add to the orebody boundary",
+    "where": "Project to work in",
+    "whereHint": "The AI agent reads in a chat of this project and the output file stays in its 문헌정리 folder. The chosen papers join the project's citation scope.",
+    "projectAttached": "{name} (folder attached)",
+    "projectsLoading": "Reading projects",
+    "noProjects": "No projects. Create a project, then open this again.",
+    "reason": {
+      "folder": "Choose a folder to cover.",
+      "counting": "Counting the folder's papers.",
+      "empty": "The folder has no papers.",
+      "question": "Write the research question.",
+      "project": "Choose the project to work in."
+    },
+    "footer": "Puts the request into a new chat of the project. When you send it, the AI agent starts, and the result enters the library as not reviewed.",
+    "cancel": "Cancel",
+    "start": "Put request in chat",
+    "starting": "Preparing request",
+    "chatTitle": "Literature digest",
+    "error": {
+      "failed": "Could not create the request. Try again.",
+      "gone": "The project or folder was not found. Reopen the list and choose again.",
+      "tooMany": "A digest holds up to 60 papers. Choose a subfolder instead."
+    }
+  }
+}

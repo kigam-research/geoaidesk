@@ -8,7 +8,7 @@ import type { FastifyInstance } from "fastify";
 import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
 import { folderSubtree, isDigestItem, isNoteItem, isPaperItem, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
 import type { DigestCandidatesResponse, DigestStatusBody, MakeDigestBody, MakeDigestResponse } from "../../../../web/src/geo/contracts/library.ts";
-import { createDigestRequest, digestCandidates, digestSummary, refreshDigestItems, setDigestStatus } from "../library/digests.ts";
+import { createDigestRequest, digestCandidates, digestSummary, newPapersSince, refreshDigestItems, setDigestStatus } from "../library/digests.ts";
 import type {
   AddLibraryNoteBody,
   AddLibraryNoteResponse,
@@ -208,7 +208,11 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       }
       const instance = libraryInstance(store), all = await store.all(), collections = await store.collections();
       const uses = buildUsesIndex(all, await workflowUses(store), collections, instance.id, projectWorkflows(all, collections));
-      return { item, uses: uses.usesOf(item), ...(isNoteItem(item) ? { noteLocal: noteIsLocal(item, instance.id, new Set(listProjects().map((p) => p.id))) } : {}) };
+      const digestExtra = isDigestItem(item) && item.digest ? {
+        digestPapers: item.digest.covers.flatMap((id) => { const p = all.find((i) => (i.id === id || i.aliases?.ids?.includes(id)) && isPaperItem(i) && !i.removedFromSourceAt); return p ? [{ id: p.id, title: p.csl.title }] : []; }),
+        digestNewPapers: newPapersSince(item, all, collections),
+      } : {};
+      return { item, uses: uses.usesOf(item), ...(isNoteItem(item) ? { noteLocal: noteIsLocal(item, instance.id, new Set(listProjects().map((p) => p.id))) } : {}), ...digestExtra };
     });
 
     /** "서재에 넣기" for a research note; the project is the body's or the request scope's. */

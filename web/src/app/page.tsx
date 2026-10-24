@@ -57,13 +57,14 @@ import {
   type WorkspaceScreen,
 } from "@/lib/workspace-persistence";
 import { seedChatStateFromTab } from "@/lib/new-tab-state";
-import { onStartGeoTask } from "@/geo/workspace/events";
+import { onStartGeoTask, startGeoTask } from "@/geo/workspace/events";
 import { geoTaskChatState } from "@/geo/workspace/tab-state";
 import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
 import { onOpenResearchNoteRequest, takeOpenResearchNote } from "@/geo/notes/open-note";
+import { onDigestChatRequest, takeDigestChat } from "@/geo/library/digest-handoff";
 import { CitationPdfContext } from "@/geo/library/citation-links";
 import { ProjectLibraryPanel } from "@/geo/library/project-library-panel";
 import { CitationPdfPane, useCitationPdf } from "@/geo/library/citation-pdf";
@@ -981,6 +982,16 @@ function WorkspacePage({
     };
     take();
     return onOpenResearchNoteRequest(take);
+  }, [isActive, projectId]);
+  // gaid-library-prep: 서재 → "문헌 정리 만들기" opens a new chat holding the request (after the start-task listener above).
+  useEffect(() => {
+    if (!isActive) return;
+    const take = () => {
+      const request = takeDigestChat(projectId);
+      if (request) startGeoTask({ ...request.task });
+    };
+    take();
+    return onDigestChatRequest(take);
   }, [isActive, projectId]);
   const [computeFocus, setComputeFocus] = useState<{ id: string; token: number } | null>(null);
   const handleViewCompute = useCallback((jobId?: string) => {

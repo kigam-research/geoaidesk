@@ -594,6 +594,9 @@ export interface LibraryItemResponse {
   uses: LibraryUse[];
   /** Research-note items: whether the note can be opened on this GAID instance (project present, file found). */
   noteLocal?: boolean;
+  /** 문헌 정리 items: the covered papers still in the library, and papers added to its folder since it was made. */
+  digestPapers?: { id: string; title: string }[];
+  digestNewPapers?: number;
 }
 
 /** `POST /geo/library/notes`: bring a research note into the library (project from the body, else the request scope). */

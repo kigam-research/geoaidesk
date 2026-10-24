@@ -1,1 +1,135 @@
-{}
+{
+  "category": "문헌 정리",
+  "categoryCount": "문헌 정리 {n}",
+  "allFolder": "모든 문헌 정리",
+  "search": "문헌 정리에서 찾기",
+  "empty": "아직 문헌 정리가 없습니다. 폴더의 논문을 AI agent가 읽고 비교·요약하게 할 수 있습니다.",
+  "state": "문헌 정리 {shown} / {total}",
+  "note": "문헌 정리는 여러 논문을 미리 읽고 묶은 자료입니다. Workflow를 시작할 때 AI agent가 먼저 읽고, 인용은 원래 논문의 쪽으로 확인합니다.",
+  "noMatch": "찾는 문헌 정리가 없습니다.",
+  "side": "문헌 정리 {n}건",
+  "recentTitle": "최근 넣은 문헌 정리",
+  "status": {
+    "pending": "검토 전",
+    "confirmed": "확인함",
+    "pendingTip": "연구자가 아직 내용을 확인하지 않았습니다",
+    "confirmedTip": "연구자가 내용을 확인했습니다"
+  },
+  "origin": {
+    "gaid": "GAID에서 만듦",
+    "external": "외부 정리",
+    "gaidTip": "AI agent가 서재 논문을 읽고 일반 Workflow로 만든 문헌 정리입니다",
+    "externalTip": "Gemini Notebook에서 내보낸 파일을 가져온 정리입니다. 인용 근거로 쓰지 않습니다"
+  },
+  "workflow": {
+    "compare-papers": "논문 비교",
+    "summarize-paper": "논문 요약",
+    "methods-comparison": "방법 비교"
+  },
+  "table": {
+    "digest": "문헌 정리",
+    "date": "날짜",
+    "origin": "출처",
+    "status": "상태",
+    "covers": "논문 {count}편",
+    "unmatched": "서재에 없는 문헌 {count}",
+    "newPapers": "정리 뒤 더한 논문 {count}"
+  },
+  "detail": {
+    "madeLine": "일반 Workflow {workflow} · 프로젝트 {project} · {date}",
+    "importedLine": "{file} · {date} 가져옴",
+    "missing": "프로젝트에서 문헌 정리 파일을 찾지 못했습니다. 서재에 남은 사본을 보여 줍니다.",
+    "question": "연구 질문",
+    "externalLimit": "외부 정리는 참고로만 읽고 인용 근거로 쓰지 않습니다.",
+    "use": {
+      "button": "Workflow에서 쓰기"
+    },
+    "useTitle": "다룬 논문을 붙일 프로젝트",
+    "usedIn": "{name}의 Workflow 시작 창에서 먼저 읽을 정리로 고를 수 있습니다",
+    "useFailed": "다룬 논문을 프로젝트에 붙이지 못했습니다. 다시 시도해 주세요.",
+    "confirm": {
+      "button": "확인함으로 표시"
+    },
+    "unconfirm": {
+      "button": "검토 전으로 되돌리기"
+    },
+    "statusFailed": "상태를 바꾸지 못했습니다. 다시 시도해 주세요.",
+    "openProject": {
+      "button": "프로젝트에서 열기"
+    },
+    "remove": {
+      "button": "서재에서 빼기"
+    },
+    "removeConfirm": "서재에서 외부 정리와 가져온 파일 기록을 뺍니다.",
+    "removeConfirmMade": "서재에서 뺍니다. 프로젝트의 문헌 정리 파일은 그대로 남습니다.",
+    "removeYes": {
+      "button": "서재에서 빼기"
+    },
+    "removed": "서재에서 뺐습니다",
+    "removeFailed": "서재에서 빼지 못했습니다. 다시 시도해 주세요.",
+    "stale": "정리한 뒤 폴더 {folder}에 논문 {count}편이 더해졌습니다.",
+    "remake": {
+      "button": "다시 만들기"
+    },
+    "coversTitle": "다룬 논문 {count}편",
+    "coversNone": "서재에 남은 논문이 없습니다.",
+    "openPaper": {
+      "action": "논문 보기"
+    },
+    "unmatched": "서재에 없는 문헌 {count}건은 연결하지 않았습니다.",
+    "outlineTitle": "정리 내용",
+    "content": "정리 전문 읽기",
+    "truncated": "앞부분만 서재에 보관했습니다. 전문은 원래 파일에 있습니다."
+  },
+  "make": {
+    "button": "문헌 정리 만들기",
+    "title": "문헌 정리 만들기",
+    "context": "AI agent가 고른 논문을 읽고 비교·요약과 인용 목록을 만들어 서재에 넣습니다.",
+    "papers": "다룰 논문",
+    "papersHint": "서재 폴더를 고릅니다. 하위 폴더의 논문도 읽습니다.",
+    "folderNone": "폴더 고르기",
+    "papersCount": "논문 {count}편",
+    "papersCountPdf": "논문 {count}편 · PDF {pdf}편",
+    "noPdf": "PDF가 없는 {count}편은 서지와 초록만 읽습니다.",
+    "kind": "정리 방식",
+    "kindHint": "GAID에 있는 일반 Workflow 가운데 하나로 정리합니다.",
+    "recommended": "권장",
+    "kinds": {
+      "compare-papers": "논문 비교",
+      "compare-papersHint": "주장, 방법, 자료, 한계를 한 표로 비교하고 쪽 인용을 붙입니다.",
+      "summarize-paper": "논문 요약",
+      "summarize-paperHint": "논문마다 목적, 방법, 결과, 의의를 따로 요약합니다. 비교표는 없습니다.",
+      "methods-comparison": "방법 비교",
+      "methods-comparisonHint": "연구 질문에 쓸 수 있는 방법을 장단점과 필요한 자료로 비교합니다."
+    },
+    "why": {
+      "compare-papers": "권장 이유: 고른 논문이 2편 이상입니다.",
+      "summarize-paper": "권장 이유: 고른 논문이 1편입니다."
+    },
+    "question": "연구 질문",
+    "questionHint": "정리의 기준이 됩니다. 한두 문장으로 적으세요.",
+    "questionPlaceholder": "예: 암석물리 제약 역산이 광체 경계 추정에 무엇을 더하는가",
+    "where": "정리할 프로젝트",
+    "whereHint": "AI agent가 고른 프로젝트의 채팅에서 읽고, 결과 파일은 프로젝트의 문헌정리 폴더에 남습니다. 고른 논문은 프로젝트 인용 범위에 붙습니다.",
+    "projectAttached": "{name} (폴더가 붙은 프로젝트)",
+    "projectsLoading": "프로젝트를 읽는 중",
+    "noProjects": "프로젝트가 없습니다. 프로젝트를 만든 뒤 다시 여세요.",
+    "reason": {
+      "folder": "다룰 폴더를 고르세요.",
+      "counting": "폴더의 논문을 세는 중입니다.",
+      "empty": "폴더에 논문이 없습니다.",
+      "question": "연구 질문을 적으세요.",
+      "project": "정리할 프로젝트를 고르세요."
+    },
+    "footer": "프로젝트의 새 채팅에 요청을 넣습니다. 보내면 AI agent가 정리를 시작하고, 끝나면 서재에 검토 전으로 들어옵니다.",
+    "cancel": "취소",
+    "start": "정리 요청 넣기",
+    "starting": "요청 준비 중",
+    "chatTitle": "문헌 정리",
+    "error": {
+      "failed": "요청을 만들지 못했습니다. 다시 시도해 주세요.",
+      "gone": "프로젝트나 폴더를 찾지 못했습니다. 목록을 새로 연 뒤 다시 고르세요.",
+      "tooMany": "문헌 정리 하나에 논문을 60편까지 넣습니다. 하위 폴더로 나누어 고르세요."
+    }
+  }
+}
