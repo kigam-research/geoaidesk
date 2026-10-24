@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T06:47:42Z
+status: active
+updated: 2026-10-24T06:58:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88242334-24a3-4030-852c-b9e9ffb2a8dd","pid":1391055,"provider":"codex","session":"01a16c9e-0b00-7740-8c11-82980cf46d08","start":"71159800","token":"6c5b08a03458b5c901586e5be96b4af834d24c257068e81294c29e8e68ac58eb"}
 branch: task/gaid-ia-connect-workspace--home-summary
 target: task/gaid-ia-connect-workspace
@@ -30,13 +30,15 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 ## Current state
 - Implemented `GET /geo/workspace/home` against the existing contract without field changes. It aggregates active projects, recent chats and notes (running/decisions/unreviewed/checked), linked Workflow titles and hub versions, installed methods grouped by slug, and only used catalogue Workflows. Archived projects and scheduler/system-only sessions are excluded; failed projects increment `unreadableProjects`.
 - Read-only verified through the real app hooks: changing/missing X-Project-Id does not change the summary or seed a project; snapshots show no project/index writes. Catalogue loading cannot stage/repair files. Environment checks reuse settled, current probes only; no subprocess or pending-probe wait. Hub pin checks use local/last-seen records, not archive downloads; unknown pins are not ready.
-- Checks passed: server typecheck; 58 tests across home/workspace-state/environments/notes/catalogue, followed by all 10 final home tests after the trial-link and hub-pin refinements; copy validator (0 errors, 101 pre-existing warnings); UI checker (0 errors, 78 accepted debt); git diff --check. No web files or visible copy changed. Parent runs web/full `scripts/check` after integration.
+- Checks passed: server typecheck; 58 tests across home/workspace-state/environments/notes/catalogue, followed by all 10 final home tests after the trial-link and hub-pin refinements; copy validator (0 errors, 101 pre-existing warnings); UI checker (0 errors, 78 accepted debt); git diff --check. No web files or visible copy changed.
+- First `task finish` automatically ran full `scripts/check`: backend 2,333 passed / 8 skipped; frontend 1,327 passed / 1 existing map-viewer test timed out at 5 seconds. Direct map-viewer recheck with `VITEST_MAX_WORKERS=1`: all 9 tests passed. Retrying finish with that worker cap, without speculative source changes.
 - Dependencies job exited 0 (receipt below). Implementation is ready for parent integration; no deployment was performed.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-24T06:47:42Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Automatic full check at `706c4131`: the default frontend concurrency timed out `src/geo/viewers/map/viewer.test.tsx:38` while several project check suites ran on the host. The test passes unchanged with one worker. First log: `~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-so06ssza.log`; output: `~/data/geoaidesk/work/checks/706c4131dbf1-20261024T064742.450078Z`.
 ## Notes and decisions
 - Sequential plan: establish read-only project/session access, reuse note/method contracts and live run broker, then aggregate/order and verify the route. This is one tightly coupled server package; no additional workers.
 - Parent approved narrow extra hunks in `server/src/index.ts` (skip project seeding only for exact GET `/geo/workspace/home`) and `server/src/geo/environments.ts` (cached-only readiness, all existing callers unchanged). Existing project/session list functions write; existing method readiness probes subprocesses. Home must do neither. Unprobed environments are conservatively not ready.
