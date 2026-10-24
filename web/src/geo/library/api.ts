@@ -108,6 +108,7 @@ export const attachWorkflowPapers = (projectId: string, method: string, itemIds:
 export const createFolder = (name: string, parentId?: string) => call<LibraryCollection>("/collections", { method: "POST", body: JSON.stringify({ name, ...(parentId ? { parentId } : {}) }) });
 export const renameFolder = (id: string, name: string) => call<LibraryCollection>(`/collections/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ name }) });
 export const deleteFolder = (id: string) => call<{ folders: number }>(`/collections/${encodeURIComponent(id)}`, { method: "DELETE" });
+export const setFolderNotebook = (id: string, url: string | null) => call<LibraryCollection>(`/collections/${encodeURIComponent(id)}/notebook`, { method: "PUT", body: JSON.stringify({ url }) });
 export const setFolderItems = (id: string, itemIds: string[], action: "add" | "remove") =>
   call<FolderMembershipResult>(`/collections/${encodeURIComponent(id)}/items`, { method: "POST", body: JSON.stringify({ itemIds, action }) });
 export const checkFolder = (id: string) => call<FolderCheckResponse>(`/collections/${encodeURIComponent(id)}/check`);

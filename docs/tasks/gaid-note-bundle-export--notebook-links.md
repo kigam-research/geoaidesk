@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:48:57Z
+updated: 2026-10-24T01:51:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d","pid":1195251,"provider":"codex","session":"01a16b98-98fb-76e2-936a-665bab0a74ca","start":"69446405","token":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
 branch: task/gaid-note-bundle-export--notebook-links
 target: task/gaid-note-bundle-export
@@ -73,11 +73,18 @@ document: files changed, the folder-panel placement chosen, string ids with Kore
 results. Network: raw.githubusercontent.com is blocked on the KIGAM network. Finish with `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the shared URL contract, project atomic store/routes and folder store/route. Verification is pending.
+The exact worktree has no codegraph index; direct source reads are used per knowledge-lookup fallback.
 ## Next steps
-1. (the next session's first action)
+1. Implement the shared popover, project wrapper and folder header placement.
+2. Add contract, route, reconcile/sync and component tests; run the declared checks.
+3. Review changes and finish this child unit for parent integration.
 ## Failed approaches
 ## Notes and decisions
+Sequential plan: settle the shared contract and storage first, build the common UI second, then verify persistence and UI together.
+This is tightly coupled work; the single writer owns all listed files and does not delegate.
+Folder placement: plain save/edit control and saved open link beside the existing More menu (at most three header actions, B4).
+No change to the parent's research-notes panel; it will mount ProjectNotebookLink.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

@@ -14,7 +14,8 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import { listProjects, type Project } from "@/lib/projects";
 import { geoLocale, t } from "@/geo/i18n";
 import type { FolderCheckResponse, FolderIssue, LibraryCollection, SendToZoteroResult } from "@/geo/contracts/library";
-import { attachFolderToProject, checkFolder, deleteFolder, exportUrl, sendFolderToZotero, setFolderItems, zoteroState } from "./api";
+import { attachFolderToProject, checkFolder, deleteFolder, exportUrl, sendFolderToZotero, setFolderItems, setFolderNotebook, zoteroState } from "./api";
+import { NotebookLinkControl } from "@/geo/notebook-link/notebook-link-control";
 import { folderPath } from "./folder-tree";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.folder.${key}`, values as never);
@@ -103,6 +104,8 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
           <h2 className="flex items-center gap-1.5 text-lg font-semibold leading-snug"><FolderIcon className="size-4 shrink-0" aria-hidden /><span className="truncate">{folderPath(collections, folder.id)}</span></h2>
           <p className="text-sm text-muted-foreground">{L("papers", { n: count })}</p>
         </div>
+        <div className="flex items-center gap-2">
+        <FolderNotebookLink key={folder.id} folder={folder} onChanged={onChanged} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={L("more")}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -111,6 +114,7 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
             <DropdownMenuItem disabled={linked} variant="destructive" onSelect={() => void remove()}>{L("delete.button")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
       {linked && <p className="text-xs text-muted-foreground">{L("linkedRule")}</p>}
 
@@ -179,4 +183,14 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
       {dialog}
     </div>
   );
+}
+
+function FolderNotebookLink({ folder, onChanged }: { folder: LibraryCollection; onChanged: () => void }) {
+  const [url, setUrl] = useState(folder.notebookUrl ?? null);
+  useEffect(() => { setUrl(folder.notebookUrl ?? null); }, [folder.notebookUrl]);
+  return <NotebookLinkControl context="folder" url={url} onSave={async (next) => {
+    const saved = await setFolderNotebook(folder.id, next);
+    setUrl(saved.notebookUrl ?? null);
+    onChanged();
+  }} />;
 }

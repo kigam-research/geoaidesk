@@ -18,6 +18,7 @@ import { join, resolve } from "node:path";
 import { KADY_PI_AGENT_DIR } from "../../config.ts";
 import { citationKeyFor } from "./formats/index.ts";
 import { folderSubtree } from "../../../../web/src/geo/contracts/library.ts";
+import { normalizeNotebookUrl } from "../../../../web/src/geo/contracts/notebook-link.ts";
 import type {
   CslItem,
   LibraryCollection,
@@ -292,6 +293,32 @@ export class LibraryStore {
     const found = (await this.collections()).find((c) => c.id === id);
     if (!found) throw new LibraryError("Folder not found", 404);
     return found;
+  }
+
+  /** GAID-owned metadata on any folder; never writes to Zotero. */
+  async setCollectionNotebook(id: string, url: string | null): Promise<LibraryCollection> {
+    const normalized = url === null ? null : normalizeNotebookUrl(url);
+    if (url !== null && !normalized) throw new LibraryError("Use an HTTPS notebook page without sign-in information in the URL", 400);
+    await this.load();
+    return this.serial(async () => {
+      const file = join(this.root, "collections.json");
+      let collections: LibraryCollection[];
+      try {
+        const value = JSON.parse(await readFile(file, "utf8"));
+        if (!Array.isArray(value) || value.some((c) => !c || typeof c.id !== "string")) throw new Error("Invalid folders");
+        collections = value;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new LibraryError("Folder not found", 404);
+        throw new LibraryError("The saved folders are malformed; they have not been changed", 409);
+      }
+      const current = collections.find((c) => c.id === id);
+      if (!current) throw new LibraryError("Folder not found", 404);
+      const next = { ...current };
+      if (normalized) next.notebookUrl = normalized;
+      else delete next.notebookUrl;
+      await this.writeJson(file, collections.map((c) => c.id === id ? next : c));
+      return next;
+    });
   }
 
   /** A new GAID folder, top level or inside any folder (also a linked one; the new folder itself is unlinked). */
