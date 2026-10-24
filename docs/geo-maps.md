@@ -120,7 +120,7 @@ The present package does not add a new chat-card protocol or rewrite WP06 skill 
 ## Evidence scope
 
 `server/test/geo-maps.test.ts` covers project scoping, request bounds, companion invalidation and artifact references.
-`geo/tests/maps-helper.test.mjs` generates synthetic known-answer fixtures outside Git for format, coordinate, area,
-window and error checks. Viewer tests cover state/request interactions. Full integration is checked by `scripts/check`.
+`geo/tests/maps-helper*.test.mjs` (three files that run in parallel, shared setup `maps-helper-common.mjs`) generate synthetic
+known-answer fixtures outside Git for format, coordinate, area, window and error checks. Viewer tests cover state/request interactions. Full integration is checked by `scripts/check`.
 See the task's canonical result report for actual executed checks and browser evidence; this document is usage guidance,
 not a claim that an arbitrary dataset, model route or operating system has been scientifically qualified.
