@@ -437,11 +437,22 @@
   "quality": {
     "note": "UI quality kit (gaid-ui-quality-kit), run by geo/ui/quality/run.mjs from scripts/check. Each tool has a mode: 'report' prints findings and never fails the check; 'block' fails on findings that are not accepted debt in geo/ui/ui-baseline.json under quality.<tool>. Findings carry the UI guide v2 rule ids below.",
     "switchRule": "A tool moves from report to block (one-line change of modes.<tool>) when (1) every current finding on main is fixed or recorded as accepted debt with its reason in geo/ui/ui-baseline.json quality.<tool>, (2) two consecutive scripts/check runs, on PC74 and on one other PC, give the same findings and, for visual, no screenshot differences beyond the threshold, and (3) the switch is recorded in a task report. A tool that cannot run (missing browser, no network) stays report-only on that run and says so.",
+    "switches": [
+      {
+        "tools": [
+          "impeccable",
+          "axe"
+        ],
+        "date": "2026-10-24",
+        "task": "gaid-ui-checks-blocking",
+        "evidence": "same findings (impeccable 0, axe 0, screenshots 0, shadcn 248) in scripts/check on PC74 (gaid-ui-shared-contrast) and PC70 at main f504ace4; report reports/2026-10-24-gaid-ui-checks-blocking/index.md"
+      }
+    ],
     "modes": {
       "shadcnLint": "report",
-      "impeccable": "report",
+      "impeccable": "block",
       "visual": "report",
-      "axe": "report"
+      "axe": "block"
     },
     "pages": [
       {

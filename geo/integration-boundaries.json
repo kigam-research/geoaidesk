@@ -1056,7 +1056,7 @@
       "path": "scripts/check",
       "owner": "gaid-ui-quality-kit",
       "status": "edited",
-      "responsibility": "Appends the report-only UI quality kit step (geo/ui/quality/run.mjs)"
+      "responsibility": "Appends the UI quality kit step (geo/ui/quality/run.mjs; impeccable and axe blocking, the rest report-only)"
     },
     {
       "path": "web/next.config.ts",

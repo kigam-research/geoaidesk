@@ -361,8 +361,11 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   shared parts pinned in every state with `data-preview`, live token contrast table; 404 in production unless
   `GAID_DEV_PAGES=1` at build time: `page.dev.tsx` + dev-only `pageExtensions` in `web/next.config.ts`) and `geo/ui/quality/run.mjs` (own package + lock, installed only by `scripts/check`): shadcn lint
   (`@shadcn/lint`), impeccable detect (telemetry off), Playwright screenshots of 계측/도폭 × light/dark at 1440×900 against
-  `geo/ui/quality/baseline/` and axe-core, each finding mapped to a guide id (`geo/ui/ui-rules.json` `quality`). Report-only
-  until `quality.switchRule` is met (then `quality.modes.<tool>` = `block`, accepted debt in `ui-baseline.json` `quality`).
+  `geo/ui/quality/baseline/` and axe-core, each finding mapped to a guide id (`geo/ui/ui-rules.json` `quality`). Modes per
+  `quality.switchRule`: impeccable and axe block (since gaid-ui-checks-blocking, 2026-10-24: same findings on PC74 and PC70;
+  a finding that is not accepted debt in `ui-baseline.json` `quality`, or a page/combination left unchecked, fails
+  `scripts/check` and points to `/dev/parts`); shadcn lint and the screenshot comparison stay report-only. A tool that cannot
+  run (no Chromium, no network) is reported as skipped and does not fail.
 - Names in visible copy (gaid-brand-copy, user decision 2026-10-15): the assistant is "AI agent" and the app is GAID;
   "Kady"/"K-Dense"/"BYOK" stay only in code identifiers, env vars, routes, model-facing text and the upstream attribution
   line. Content taken from K-Dense shows its source where it is shown: catalogue skills via `SkillInfo.upstream`
@@ -375,8 +378,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Upstream sync: `docs/upstream-sync.md` (merge commit on a task branch, update `geo/upstream.lock.json`, log it).
 - Checks: `scripts/check` runs the upstream CI steps (`.github/workflows/tests.yml`) on Linux, then the GAID
   checks (`node --test 'geo/tests/*.test.mjs'`, `geo/tests/environments-smoke.mjs`, `start-gaid.sh --check`,
-  `geo/tests/production-smoke.mjs`, then the report-only UI quality kit). It needs Node >= 22.19, uv, network access to the npm registry, PyPI and GitHub,
-  and the pinned catalogue archive (asset) for the geo steps.
+  `geo/tests/production-smoke.mjs`, then the UI quality kit: impeccable and axe blocking, shadcn lint and screenshots report-only). It needs Node >= 22.19,
+  uv, network access to the npm registry, PyPI and GitHub (and once per PC the Playwright CDN for Chromium; on the KIGAM
+  network Node must trust the institute CA, e.g. `NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt`, or the browser
+  tools are skipped), and the pinned catalogue archive (asset) for the geo steps.
 
 ## Work policy v1
 
