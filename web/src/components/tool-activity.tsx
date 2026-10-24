@@ -2,7 +2,6 @@
 import { geoText, t } from "@/geo/i18n";
 import {
   BookOpenIcon,
-  BrainIcon,
   CheckIcon,
   ChevronRightIcon,
   FileEditIcon,
@@ -10,11 +9,11 @@ import {
   FilePlusIcon,
   FolderTreeIcon,
   ImagePlusIcon,
+  ScrollTextIcon,
   SearchIcon,
   ServerCogIcon,
   TerminalIcon,
   UsersIcon,
-  WandSparklesIcon,
   WrenchIcon,
   XIcon,
 } from "lucide-react";
@@ -239,7 +238,7 @@ const ToolCard = memo(function ToolCard({ item }: { item: ActivityItem }) {
           <span className="size-3 shrink-0" />
         )}
         {skill ? (
-          <WandSparklesIcon className="size-3.5 shrink-0 text-muted-foreground" />
+          <ScrollTextIcon className="size-3.5 shrink-0 text-muted-foreground" />
         ) : (
           <ToolIcon toolName={item.toolName} />
         )}
@@ -416,7 +415,6 @@ export function ReasoningBlock({ reasoning }: { reasoning: string }) {
         <ChevronRightIcon
           className={cn("size-3 transition-transform", open && "rotate-90")}
         />
-        <BrainIcon className="size-3.5" />
         <span>{appText("chat.tools.reasoning")}</span>
       </CollapsibleTrigger>
       <CollapsibleContent>

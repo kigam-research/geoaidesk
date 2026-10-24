@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
@@ -31,7 +32,12 @@ function readAppVersion(): string {
   return "0.0.0";
 }
 
-const nextConfig: NextConfig = {
+const config = (phase: string): NextConfig => ({
+  // GAID development pages (`page.dev.tsx`, e.g. the parts page /dev/parts) exist only in `next dev` or in a build made
+  // with GAID_DEV_PAGES=1; a production build has no such routes.
+  pageExtensions: phase === PHASE_DEVELOPMENT_SERVER || process.env.GAID_DEV_PAGES === "1"
+    ? ["dev.tsx", "tsx", "ts", "jsx", "js"]
+    : ["tsx", "ts", "jsx", "js"],
   devIndicators: false,
   async headers() {
     return [{ source: "/office/:path*", headers: [
@@ -54,6 +60,6 @@ const nextConfig: NextConfig = {
       distribution?.repository ? "/releases" : ""
     }`,
   },
-};
+});
 
-export default nextConfig;
+export default config;
