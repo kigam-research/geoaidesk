@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T01:50:46Z
+status: done
+updated: 2026-10-24T01:51:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88cca85b-4b8e-4edd-b09b-2d41608083e0","pid":926474,"provider":"claude","session":"fa954eb4-c14c-4138-b556-4c278eaf0e94","start":"69251314","token":"9825be956e484ea4be90d2e182aaed55b5cf2c9ca62fa47c866e8d332f9219cb"}
 branch: task/gaid-promo-video-v4-brag
 target: main
@@ -79,7 +79,9 @@ they help. Sources `geo/promo/brag/promo40/`; both films in the one report and r
 - Report written (both films), humanizer pass done, registry entries `gaid-promo-video-v4-brag` and
   `gaid-promo-video-v4-brag-40s` (`review`, alongside v4).
 ## Next steps
-1. None in this unit; the user reviews both films (sound not checked by ear here).
+<!-- task:closed -->
+Closed 2026-10-24T01:51:07Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - promo40 preview 1: inactive scene layers hidden with `visibility: hidden` still showed children that `put()` set to
   `visible`; fixed by `display: none` for inactive layers and highlight items.
