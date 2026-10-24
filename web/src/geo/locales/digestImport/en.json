@@ -1,1 +1,37 @@
-{}
+{
+  "title": "Import Gemini output",
+  "context": "Add an exported file to your library as an external digest.",
+  "fileLabel": "Output file",
+  "fileHint": "Word (.docx), PDF, Markdown, text, CSV · up to 30 MB",
+  "drop": "Drop a file here or choose a file.",
+  "pick": { "button": "Choose file" },
+  "replace": { "button": "Replace file" },
+  "reading": "Reading file…",
+  "limit": "External digests enter as not reviewed and are not citation evidence. GAID sends nothing to Google.",
+  "nameLabel": "Digest name",
+  "urlLabel": "Notebook URL (optional)",
+  "covers": { "heading": "Covered papers" },
+  "coversHint": "Matched by DOI or title. Choose the papers to link.",
+  "byDoi": "DOI match",
+  "byTitle": "Title match",
+  "noMatches": "No library papers match the DOIs or titles in the file.",
+  "unmatched": "Not in the library · not linked",
+  "excerpt": "View extracted text",
+  "folder": "Save to folder: {name}",
+  "rootFolder": "Save to: Library",
+  "cancel": { "button": "Cancel" },
+  "save": { "button": "Add to library" },
+  "saving": "Adding to library…",
+  "needFile": "Choose an output file first.",
+  "needTitle": "Enter a digest name.",
+  "error": { "technical": "Technical details" },
+  "copy": { "button": "Copy technical details" },
+  "errors": {
+    "type": "Unsupported file. Choose Word, PDF, Markdown, text or CSV.",
+    "size": "The file is too large. Split it into files of 30 MB or less and import again.",
+    "read": "Could not read the file. Check its password and format. For scanned PDFs, import a file with recognized text or a text export.",
+    "url": "Check the notebook URL. Enter an https URL without sign-in credentials.",
+    "expired": "Choose the file again. The preview expired or the server restarted.",
+    "save": "Could not add to the library. Check the folder and connection, then try again."
+  }
+}
