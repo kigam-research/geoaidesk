@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-24T02:09:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7b6c0c70-dc29-4c26-aee1-6a9e2549e4b2","pid":1222631,"provider":"codex","session":"01a16b9a-30c0-7823-bbfa-e604026a2474","start":"69456843","token":"8d41e205d92dc2e9f2d13e4620748ccd6276cd4ae4f4294f054d0afbb6e2d1fb"}
 branch: task/gaid-promo-video-v5--capture
@@ -61,8 +61,9 @@ No model runs, messages, starts, registrations, installs or user-data edits were
 Inventory: 1,641 files before/after; all Yilgarn project and skill-hub files unchanged. Only library/zotero.json changed hash/mtime. GET library triggers automatic Zotero refresh in server code; exact changed field was not established. Thus literal identical-inventory criterion is unmet and must be reported by the parent. No data was restored to hide it. Film integration remains the parent's work.
 
 ## Next steps
-1. Parent: task complete gaid-promo-video-v5--capture, then use capture-v5/capture.json for composition and preserve the documented inventory exception in its report.
-2. Offline recheck: uv run --no-project --with pillow==12.3.0 python geo/promo/capture_v5_verify.py.
+<!-- task:closed -->
+Closed 2026-10-24T02:09:03Z: ready; the parent gaid-promo-video-v5 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First job launch refused dirty source; saved reviewed helper before launching job 1.
 - First map manifest request was blocked; confirmed /geo/result is read-only and explicitly allowlisted it.
